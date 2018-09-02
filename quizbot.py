@@ -5,7 +5,7 @@ import os
 import json
 
 # bot
-slack_token = os.environ["SLACK_BOT_TOKEN"]
+slack_token = os.environ.get("SLACK_BOT_TOKEN", None)
 sc = SlackClient(slack_token)
 
 # channels = slack_api.api_call(
@@ -15,18 +15,20 @@ sc = SlackClient(slack_token)
 # general: CC7EWCEAY
 # quiz: CCAMPJ57E
 
+
 def clean_answer(text):
-    for character in ['?', '!', ',', '.','\\']:
+    for character in ['?', '!', ',', '.', '\\', '\'']:
         text = text.replace(character, "")
     return text.lower()
-    
+
+
 answers = []
 with open('questions/four_letter_countries.json') as file:
 answers_found = []
     json_data = json.load(file)
     for answer in json_data['answers']:
         if answer != '':
-            answers.append(clean_answer(answer.strip().replace('&','&amp;')))
+            answers.append(clean_answer(answer.strip().replace('&', '&amp;')))
 
 STARTING_ANSWER_COUNT = len(answers)
 random.seed(os.urandom(1024))
@@ -69,8 +71,6 @@ if CHEAT_TO_RESULTS:
         }
 
     }
-
-
 
 
 def get_username(user_id):
