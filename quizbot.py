@@ -22,7 +22,7 @@ with open('questions/four_letter_countries.json') as file:
         if answer != '':
             answers.append(answer.lower().strip())
 
-STARTING_ANSWER_COUNT=len(answers)
+STARTING_ANSWER_COUNT = len(answers)
 random.seed(os.urandom(1024))
 golden_answers = []
 golden_answers.append(random.choice(answers))
@@ -38,9 +38,9 @@ MINUTES_NO_GUESSES = 1
 # As soon as the quiz starts, set the timer before there's a real guess.
 last_correct_answer = time.time()
 POINT_DEFAULT_WEIGHT = 1
-QUIZ_MASTER = 'UC7HXJ319'
+QUIZ_MASTER = os.environ['QUIZ_MASTER']
 GOLDEN_ANSWER_POINTS = 3
-QUIZ_CHANNEL_ID = 'CCAMPJ57E'
+QUIZ_CHANNEL_ID = os.environ['QUIZ_CHANNEL_ID']
 
 results_object = {}
 CHEAT_TO_RESULTS = False
@@ -97,6 +97,11 @@ def podium_medal(position):
         return ':second_place_medal:'
     if position == 3:
         return ':third_place_medal:'
+    # Last place
+    if position == len(results_object):
+        return ':poop:'
+    else:
+        return ''
 
 
 def quiz_results(client, results_object, forced=False):
@@ -171,6 +176,13 @@ def bot_reaction(msg_timestamp, emoji):
     )
 
 
+def check_plural(num):
+    if num > 1:
+        return 's'
+    else:
+        return ''
+
+
 if sc.rtm_connect(with_team_state=True):
     # sc.api_call(
     #     "chat.postMessage",
@@ -185,7 +197,7 @@ if sc.rtm_connect(with_team_state=True):
         print('Connected')
         # Without the sleep, connected seems to be true, but a message can't be sent?
         time.sleep(1)
-        bot_say('<!here> Quiz starting. *{title}* - {description}.\n\nThere are *{total}* total answers, and {goldens} golden answers worth *{golden_points}* points :moneybag: each.'.format(
+        bot_say('<!here> Quiz starting. *{title}* - {description}.\n\nThere are *{total}* total answers. *{goldens} golden answers* :tada: worth *{golden_points}* points :moneybag: each. Chosen at random.'.format(
             title=json_data['title'],
             total=STARTING_ANSWER_COUNT,
             description=json_data['description'],
@@ -231,11 +243,11 @@ if sc.rtm_connect(with_team_state=True):
 
                     if guess in golden_answers:
                         point_weight = GOLDEN_ANSWER_POINTS
-                        bot_say('A Golden answer was found! {} :tada: by user {}. {} point!'.format(
+                        bot_say('A Golden answer was found! "{}" :tada: by user <@{}>. {} points!'.format(
                             guess, user, point_weight))
                     else:
-                        bot_say('Answer found! {} by user {}. {} point!'.format(
-                            guess, user, point_weight))
+                        bot_say('Answer found! "{}" by <@{}>. {} point{plural}!'.format(
+                            guess, user, point_weight, plural=check_plural(point_weight)))
                     if user not in results_object:
                         results_object[user] = {}
                         results_object[user]['score'] = point_weight
