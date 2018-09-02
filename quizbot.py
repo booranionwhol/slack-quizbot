@@ -234,7 +234,7 @@ if sc.rtm_connect(with_team_state=True):
                 time.sleep(WEBSOCKET_READLOOP_SLEEP)
                 continue
 
-            if read[0]['type'] == 'message':
+            if read[0]['type'] == 'message' and 'text' in read[0]:
                 (user, time_at, guess) = parse_message(read)
 
                 if 'results' in guess and user == QUIZ_MASTER:
