@@ -136,8 +136,8 @@ def quiz_results(client, results_object, forced=False):
     quit('Finished!')
 
 
-def bot_say(msg):
-    sc.rtm_send_message('#quiz', msg)
+def bot_say(msg, channel='#quiz'):
+    sc.rtm_send_message(channel, msg)
 
 
 def check_if_points_escalated():
@@ -164,6 +164,13 @@ def parse_message(read_line_object):
     cleaned = clean_answer(read_line_object[0]['text'])
     user = read_line_object[0]['user']
     time_at = read_line_object[0]['ts']
+    channel = read_line_object[0]['channel']
+    # Check if direct message
+    if channel[0:2] == 'DC' and user == QUIZ_MASTER:
+        logger('Private Message received from QUIZ_MASTER: {}'.format(cleaned))
+        if cleaned == 'remaining':
+            bot_say(str(answers), channel)
+
     logger('{time_now} - At {time_msg} User {user} says: {orig}. Cleaned: {cleaned}'.format(
         user=user,
         time_now=time.time(),
