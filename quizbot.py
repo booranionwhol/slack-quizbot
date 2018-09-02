@@ -22,6 +22,7 @@ def clean_answer(text):
     
 answers = []
 with open('questions/four_letter_countries.json') as file:
+answers_found = []
     json_data = json.load(file)
     for answer in json_data['answers']:
         if answer != '':
@@ -243,6 +244,10 @@ if sc.rtm_connect(with_team_state=True):
                 if 'results' in guess and user == QUIZ_MASTER:
                     quiz_results(sc, results_object, forced=True)
 
+                # Answer was right, but already found
+                if guess in answers_found:
+                    bot_reaction(msg_timestamp=time_at,
+                                 emoji='snail')
                 # Right answer
                 if guess in answers:
                     last_correct_answer = float(time_at)
@@ -270,6 +275,7 @@ if sc.rtm_connect(with_team_state=True):
 
                     # Not the best way if the list is huge? Or if there's dupes?
                     answers.remove(guess)
+                    answers_found.append(guess)
                     sc.rtm_send_message(
                         "#quiz", "There are {} answers left".format(len(answers)))
 
