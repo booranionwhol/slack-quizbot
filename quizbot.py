@@ -161,14 +161,14 @@ def logger(msg):
 
 
 def parse_message(read_line_object):
-    cleaned = clean_answer(read[0]['text'])
-    user = read[0]['user']
-    time_at = read[0]['ts']
+    cleaned = clean_answer(read_line_object[0]['text'])
+    user = read_line_object[0]['user']
+    time_at = read_line_object[0]['ts']
     logger('{time_now} - At {time_msg} User {user} says: {orig}. Cleaned: {cleaned}'.format(
         user=user,
         time_now=time.time(),
         time_msg=time_at,
-        orig=read[0]['text'],
+        orig=read_line_object[0]['text'],
         cleaned=cleaned
     ))
     return (user, time_at, cleaned)
