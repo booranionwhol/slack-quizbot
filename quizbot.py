@@ -15,6 +15,11 @@ sc = SlackClient(slack_token)
 # general: CC7EWCEAY
 # quiz: CCAMPJ57E
 
+def clean_answer(text):
+    for character in ['?', '!', ',', '.','\\']:
+        text = text.replace(character, "")
+    return text.lower()
+    
 answers = []
 with open('questions/four_letter_countries.json') as file:
     json_data = json.load(file)
@@ -65,8 +70,6 @@ if CHEAT_TO_RESULTS:
     }
 
 
-def clean_answer(text):
-    return text.lower().replace("?", "")
 
 
 def get_username(user_id):
