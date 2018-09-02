@@ -25,7 +25,10 @@ with open('questions/four_letter_countries.json') as file:
 STARTING_ANSWER_COUNT = len(answers)
 random.seed(os.urandom(1024))
 golden_answers = []
-golden_answers.append(random.choice(answers))
+for i in range(1, int(len(answers)/10)):
+    golden_random = random.choice(answers)
+    if golden_random not in golden_answers:
+        golden_answers.append(golden_random)
 # rand=random.randint(0, len(answers)-1)
 print(answers)
 print('golden: {}'.format(golden_answers))
