@@ -20,7 +20,7 @@ with open('questions/four_letter_countries.json') as file:
     json_data = json.load(file)
     for answer in json_data['answers']:
         if answer != '':
-            answers.append(answer.lower().strip())
+            answers.append(clean_answer(answer.strip().replace('&','&amp;')))
 
 STARTING_ANSWER_COUNT = len(answers)
 random.seed(os.urandom(1024))
@@ -145,7 +145,7 @@ def check_if_points_escalated():
     if time.time()-last_correct_answer >= float(MINUTES_NO_GUESSES*60):
         if POINT_ESCALATION_OFFERED is False:
             point_weight = 2
-            bot_say('There have not been any correct guesses in {} minutes. Next answer worth {} points!'.format(
+            bot_say('There have not been any correct guesses in {} minutes. Next correct answer worth {} points!'.format(
                 MINUTES_NO_GUESSES, point_weight))
             POINT_ESCALATION_OFFERED = True
 
