@@ -17,19 +17,28 @@ sc = SlackClient(slack_token)
 
 
 def clean_answer(text):
-    for character in ['?', '!', ',', '.', '\\', '\'']:
+    for character in ['?', '!', ',', '.', '\\', '\'', ':', '-']:
         text = text.replace(character, "")
     return text.lower()
 
 
+QUIZ_MODE = ''
+QUESTION_COUNT = 0
+REMAINING_QUESTIONS = 0
 answers = []
-with open('questions/four_letter_countries.json') as file:
 answers_found = []
+with open('questions/four_letter_countries.json') as file:
     json_data = json.load(file)
-    for answer in json_data['answers']:
-        if answer != '':
-            answers.append(clean_answer(answer.strip().replace('&', '&amp;')))
-
+    if json_data.get('mode') == 'QA':
+        QUIZ_MODE = 'QA'
+        CURRENT_QUESTION = 0
+        QUESTION_COUNT = len(json_data['questions'])
+        REMAINING_QUESTIONS = QUESTION_COUNT
+    else:
+        for answer in json_data['answers']:
+            if answer != '':
+                answers.append(clean_answer(
+                    answer.strip().replace('&', '&amp;')))
 STARTING_ANSWER_COUNT = len(answers)
 random.seed(os.urandom(1024))
 golden_answers = []
@@ -43,7 +52,7 @@ print('golden: {}'.format(golden_answers))
 # print(len(answers),rand,answers[rand])
 
 # raise SystemExit
-WEBSOCKET_READLOOP_SLEEP = 0.2
+WEBSOCKET_READLOOP_SLEEP = 0.1
 POINT_ESCALATION_OFFERED = False
 MINUTES_NO_GUESSES = 1
 # As soon as the quiz starts, set the timer before there's a real guess.
@@ -125,14 +134,17 @@ def quiz_results(client, results_object, forced=False):
     for index, result in enumerate(sorted(results_to_sort, reverse=True)):
         score = result[0]
         user_id = result[1]
-        correct_answers=results_object[user_id]['total_correct_answers']
+        correct_answers = results_object[user_id]['total_correct_answers']
         result_output += "{pos} {medal}) <@{user}>, score: {score}. Correct answers: {answers} ({guess_percent:02.0f}% accuracy)\n".format(
             pos=ordinal(index+1),
             medal=podium_medal(index+1),
             user=user_id,
             score=score,
             answers=correct_answers,
-            guess_percent=correct_answers/results_object[user_id]['total_guesses']*100
+            guess_percent=(
+                correct_answers /
+                results_object[user_id]['total_guesses'] *
+                100)
         )
     bot_say('{}'.format(result_output))
     logger(results_object)
@@ -216,6 +228,16 @@ def check_plural(num):
         return ''
 
 
+def ask_question(question_id):
+    global answers
+    for question, answer in json_data['questions'][question_id].items():
+        bot_say('Question {i}) {question}'.format(
+            i=question_id+1, question=question))
+        # Set global
+        answers = answer
+        print('Asking question #{}. Listening for answer: {}'.format(question_id,answers))
+
+
 if sc.rtm_connect(with_team_state=True):
     # sc.api_call(
     #     "chat.postMessage",
@@ -230,13 +252,22 @@ if sc.rtm_connect(with_team_state=True):
         print('Connected')
         # Without the sleep, connected seems to be true, but a message can't be sent?
         time.sleep(1)
-        bot_say('<!here> Quiz starting. *{title}* - {description}.\n\nThere are *{total}* total answers. *{goldens} golden answers* :tada: worth *{golden_points}* points :moneybag: each. Chosen at random.'.format(
-            title=json_data['title'],
-            total=STARTING_ANSWER_COUNT,
-            description=json_data['description'],
-            goldens=len(golden_answers),
-            golden_points=GOLDEN_ANSWER_POINTS
-        ))
+        if QUIZ_MODE == 'QA':
+            bot_say('<!here> Quiz starting. *{title}* - {description}.\n\nThere are *{total}* total questions.'.format(
+                title=json_data['title'],
+                total=QUESTION_COUNT,
+                description=json_data['description']
+            ))
+            time.sleep(3)
+            ask_question(CURRENT_QUESTION)
+        else:
+            bot_say('<!here> Quiz starting. *{title}* - {description}.\n\nThere are *{total}* total answers. *{goldens} golden answers* :tada: worth *{golden_points}* points :moneybag: each. Chosen at random.'.format(
+                title=json_data['title'],
+                total=STARTING_ANSWER_COUNT,
+                description=json_data['description'],
+                goldens=len(golden_answers),
+                golden_points=GOLDEN_ANSWER_POINTS
+            ))
 
     # Returns "not_allowed_token_type". Apparently bots can't join channels, but have to be invited?
     # r=sc.api_call(
@@ -251,9 +282,15 @@ if sc.rtm_connect(with_team_state=True):
     # Main game loop
 
     while sc.server.connected is True:
+        time.sleep(WEBSOCKET_READLOOP_SLEEP)
+
         # End the quiz if no answers left
-        if len(answers) == 0:
-            quiz_results(sc, results_object)
+        if QUIZ_MODE == 'QA':
+            if REMAINING_QUESTIONS == 0:
+                quiz_results(sc, results_object)
+        else:
+            if len(answers) == 0:
+                quiz_results(sc, results_object)
 
         # Set the points available for the next answer
         point_weight = check_if_points_escalated()
@@ -301,12 +338,19 @@ if sc.rtm_connect(with_team_state=True):
                 # Not the best way if the list is huge? Or if there's dupes?
                 answers.remove(guess)
                 answers_found.append(guess)
-                sc.rtm_send_message(
-                    "#quiz", "There are {} answers left".format(len(answers)))
+                if QUIZ_MODE != 'QA':
+                    sc.rtm_send_message(
+                        "#quiz", "There are {} answers left".format(len(answers)))
 
                 # Reset point offer increase
                 POINT_ESCALATION_OFFERED = False
                 point_weight = POINT_DEFAULT_WEIGHT
+
+                if QUIZ_MODE == 'QA':
+                    CURRENT_QUESTION = CURRENT_QUESTION+1
+                    REMAINING_QUESTIONS = REMAINING_QUESTIONS-1
+                    if REMAINING_QUESTIONS != 0:
+                        ask_question(CURRENT_QUESTION)
 
         # print(read)
         i += 1
