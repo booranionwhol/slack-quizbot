@@ -125,12 +125,14 @@ def quiz_results(client, results_object, forced=False):
     for index, result in enumerate(sorted(results_to_sort, reverse=True)):
         score = result[0]
         user_id = result[1]
-        result_output += "{pos} {medal}) <@{user}>, score: {score}. Correct answers: {answers}\n".format(
+        correct_answers=results_object[user_id]['total_correct_answers']
+        result_output += "{pos} {medal}) <@{user}>, score: {score}. Correct answers: {answers} ({guess_percent:02.0f}% accuracy)\n".format(
             pos=ordinal(index+1),
             medal=podium_medal(index+1),
             user=user_id,
             score=score,
-            answers=results_object[user_id]['total_correct_answers']
+            answers=correct_answers,
+            guess_percent=correct_answers/results_object[user_id]['total_guesses']*100
         )
     bot_say('{}'.format(result_output))
     logger(results_object)
@@ -194,6 +196,8 @@ class Message:
                 results_object[self.user] = {}
                 results_object[self.user]['score'] = 0
                 results_object[self.user]['total_correct_answers'] = 0
+                results_object[self.user]['total_guesses'] = 0
+            results_object[self.user]['total_guesses'] += 1
 
 
 def bot_reaction(msg_timestamp, emoji):
