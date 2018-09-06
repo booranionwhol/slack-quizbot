@@ -133,6 +133,7 @@ def quiz_results(client, results_object, forced=False):
             answers=results_object[user_id]['total_correct_answers']
         )
     bot_say('{}'.format(result_output))
+    logger(results_object)
     quit('Finished!')
 
 
@@ -179,6 +180,20 @@ def parse_message(read_line_object):
         cleaned=cleaned
     ))
     return (user, time_at, cleaned)
+
+
+class Message:
+    def __init__(self, read_msg):
+        self.is_guess = False
+
+        if read_msg.get('type') and read_msg.get('text'):
+            self.is_guess = True
+            (self.user, self.time_at,
+                self.guess) = parse_message([read_msg])
+            if self.user not in results_object:
+                results_object[self.user] = {}
+                results_object[self.user]['score'] = 0
+                results_object[self.user]['total_correct_answers'] = 0
 
 
 def bot_reaction(msg_timestamp, emoji):
@@ -232,71 +247,68 @@ if sc.rtm_connect(with_team_state=True):
     # Main game loop
 
     while sc.server.connected is True:
-        read = sc.rtm_read()
+        # End the quiz if no answers left
+        if len(answers) == 0:
+            quiz_results(sc, results_object)
 
+        # Set the points available for the next answer
         point_weight = check_if_points_escalated()
 
-        if len(read) is 0:
-            time.sleep(WEBSOCKET_READLOOP_SLEEP)
-            continue
-
-        if 'type' in read[0]:
-            if read[0]['type'] == 'user_typing':
+        for read_msg in sc.rtm_read():
+            message = Message(read_msg)
+            if not message.is_guess:
                 time.sleep(WEBSOCKET_READLOOP_SLEEP)
-                continue
+                continue  # Read next message
 
-            if read[0]['type'] == 'message' and 'text' in read[0]:
-                (user, time_at, guess) = parse_message(read)
+            (user, time_at, guess) = (message.user, message.time_at, message.guess)
 
-                if 'results' in guess and user == QUIZ_MASTER:
-                    quiz_results(sc, results_object, forced=True)
+            if 'results' in guess and user == QUIZ_MASTER:
+                quiz_results(sc, results_object, forced=True)
 
-                # Answer was right, but already found
-                if guess in answers_found:
-                    bot_reaction(msg_timestamp=time_at,
-                                 emoji='snail')
-                # Right answer
-                if guess in answers:
-                    last_correct_answer = float(time_at)
+            # Answer was right, but already found
+            if guess in answers_found:
+                bot_reaction(msg_timestamp=time_at,
+                             emoji='snail')
+            # Right answer
+            if guess in answers:
+                last_correct_answer = float(time_at)
 
-                    if guess in golden_answers:
-                        point_weight = GOLDEN_ANSWER_POINTS
-                        bot_say('A Golden answer was found! "{}" :tada: by user <@{}>. {} points!'.format(
-                            guess, user, point_weight))
-                    else:
-                        bot_say('Answer found! "{}" by <@{}>. {} point{plural}!'.format(
-                            guess, user, point_weight, plural=check_plural(point_weight)))
-                    if user not in results_object:
-                        results_object[user] = {}
-                        results_object[user]['score'] = point_weight
-                        results_object[user]['total_correct_answers'] = 1
-                    else:
-                        results_object[user]['score'] += point_weight
-                        results_object[user]['total_correct_answers'] += 1
+                if guess in golden_answers:
+                    point_weight = GOLDEN_ANSWER_POINTS
+                    bot_say('A Golden answer was found! "{}" :tada: by user <@{}>. {} points!'.format(
+                        guess, user, point_weight))
+                else:
+                    bot_say('Answer found! "{}" by <@{}>. {} point{plural}!'.format(
+                        guess, user, point_weight, plural=check_plural(point_weight)))
+                if user not in results_object:
+                    results_object[user] = {}
+                    results_object[user]['score'] = point_weight
+                    results_object[user]['total_correct_answers'] = 1
+                else:
+                    results_object[user]['score'] += point_weight
+                    results_object[user]['total_correct_answers'] += 1
 
-                    bot_reaction(msg_timestamp=time_at,
-                                 emoji='heavy_check_mark')
+                bot_reaction(msg_timestamp=time_at,
+                             emoji='heavy_check_mark')
 
-                    if guess in golden_answers:
-                        bot_reaction(msg_timestamp=time_at, emoji='tada')
+                if guess in golden_answers:
+                    bot_reaction(msg_timestamp=time_at, emoji='tada')
 
-                    # Not the best way if the list is huge? Or if there's dupes?
-                    answers.remove(guess)
-                    answers_found.append(guess)
-                    sc.rtm_send_message(
-                        "#quiz", "There are {} answers left".format(len(answers)))
+                # Not the best way if the list is huge? Or if there's dupes?
+                answers.remove(guess)
+                answers_found.append(guess)
+                sc.rtm_send_message(
+                    "#quiz", "There are {} answers left".format(len(answers)))
 
-                    # Reset point offer increase
-                    POINT_ESCALATION_OFFERED = False
-                    point_weight = POINT_DEFAULT_WEIGHT
-        else:
-            print(read)
+                # Reset point offer increase
+                POINT_ESCALATION_OFFERED = False
+                point_weight = POINT_DEFAULT_WEIGHT
+
+        # print(read)
         i += 1
         # if i < 10:
         #     sc.rtm_send_message("#quiz", "test {}".format(i))
 
-        if len(answers) == 0:
-            quiz_results(sc, results_object)
 
 else:
     print("Connection Failed")
