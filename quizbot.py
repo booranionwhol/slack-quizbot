@@ -151,7 +151,7 @@ def quiz_results(client, results_object, forced=False):
     quit('Finished!')
 
 
-def bot_say(msg, channel='#quiz'):
+def bot_say(msg, channel=QUIZ_CHANNEL_ID):
     sc.rtm_send_message(channel, msg)
 
 
@@ -234,7 +234,7 @@ def ask_question(question_id):
         bot_say('Question {i}) {question}'.format(
             i=question_id+1, question=question))
         # Set global
-        answers = answer
+        answers = [answer[0].lower()]
         print('Asking question #{}. Listening for answer: {}'.format(question_id,answers))
 
 
