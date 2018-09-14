@@ -54,7 +54,10 @@ print('golden: {}'.format(golden_answers))
 # raise SystemExit
 WEBSOCKET_READLOOP_SLEEP = 0.1
 POINT_ESCALATION_OFFERED = False
+CLUES_OFFERED = 0
 MINUTES_NO_GUESSES = 1
+MINUTES_UNTIL_CLUE = 2
+MINUTES_UNTIL_SECOND_CLUE = 3
 # As soon as the quiz starts, set the timer before there's a real guess.
 last_correct_answer = time.time()
 POINT_DEFAULT_WEIGHT = 1
@@ -155,18 +158,63 @@ def bot_say(msg, channel=QUIZ_CHANNEL_ID):
     sc.rtm_send_message(channel, msg)
 
 
+def goodbye():
+    bot_say('I have been terminated. NO MORE QUIZ. :tired_face:')
+
+
+def find_vowels(line):
+    vowels = ['a', 'e', 'i', 'o', 'u']
+    clue_list = []
+    for letter in line.lower():
+        if letter in vowels:
+            clue_list.append(letter)
+    return clue_list
+
+
 def check_if_points_escalated():
     # We need to set this to check in a later read loop. Make global
-    global POINT_ESCALATION_OFFERED, point_weight
+    global POINT_ESCALATION_OFFERED, point_weight, CLUES_OFFERED
 
-    if POINT_ESCALATION_OFFERED is False:
+    if POINT_ESCALATION_OFFERED is False and CLUES_OFFERED is 0:
         point_weight = POINT_DEFAULT_WEIGHT
     if time.time()-last_correct_answer >= float(MINUTES_NO_GUESSES*60):
         if POINT_ESCALATION_OFFERED is False:
             point_weight = 2
             bot_say('There have not been any correct guesses in {} minutes. Next correct answer worth {} points!'.format(
                 MINUTES_NO_GUESSES, point_weight))
+            logger('Point escalation offered at {}'.format(time.time()))
             POINT_ESCALATION_OFFERED = True
+    if time.time()-last_correct_answer >= float(MINUTES_UNTIL_CLUE*60) and CLUES_OFFERED == 0:
+        point_weight = 0.5
+        bot_say('There have not been any correct guesses in {} minutes. Next answer now worth {} points with a clue:'.format(
+            MINUTES_UNTIL_CLUE, point_weight))
+
+        for question, answer in json_data['questions'][CURRENT_QUESTION].items():
+            # There should only be one question object.
+            vowels_clue_list = find_vowels(answer[0])
+            vowels_clue = ' '.join(vowels_clue_list[0:2])
+
+        bot_say('The first two vowels for *{question}* are: *{vowels}*'.format(
+            question=question,
+            vowels=vowels_clue.upper()
+        ))
+        logger('Clue offered at {}'.format(time.time()))
+        CLUES_OFFERED = 1
+    if time.time()-last_correct_answer >= float(MINUTES_UNTIL_SECOND_CLUE*60) and CLUES_OFFERED == 1:
+        point_weight = 0.1
+        bot_say('You are all terrible. No correct guesses in {} minutes. Next answer now worth {} points with a big clue:'.format(
+            MINUTES_UNTIL_SECOND_CLUE, point_weight))
+
+        for question, answer in json_data['questions'][CURRENT_QUESTION].items():
+            # There should only be one question object.
+            answer = answer[0]
+
+        bot_say('The *first half* of *{question}* is: *{clue}*'.format(
+            question=question,
+            clue=answer[0:round(len(answer)/2)]
+        ))
+        logger('Second Clue offered at {}'.format(time.time()))
+        CLUES_OFFERED = 2
 
     return point_weight
 
@@ -199,6 +247,7 @@ def parse_message(read_line_object):
 class Message:
     def __init__(self, read_msg):
         self.is_guess = False
+        self.is_question = False
 
         if read_msg.get('type') and read_msg.get('text'):
             self.is_guess = True
@@ -210,6 +259,17 @@ class Message:
                 results_object[self.user]['total_correct_answers'] = 0
                 results_object[self.user]['total_guesses'] = 0
             results_object[self.user]['total_guesses'] += 1
+        elif read_msg.get('ok', False):
+            if read_msg.get('text').startswith('Question'):
+                self.is_question = True
+                self.time_at = float(read_msg.get('ts'))
+                # Point escalation logic is based from last_correct_answer time.
+                # Allow this to work with new Q+A format also, by re-setting it to
+                # the time the question was offered.
+                global last_question_time, last_correct_answer
+                last_question_time = self.time_at
+                last_correct_answer = last_question_time
+                logger('Question asked at {}'.format(self.time_at))
 
 
 def bot_reaction(msg_timestamp, emoji):
@@ -345,6 +405,7 @@ if sc.rtm_connect(with_team_state=True):
 
                 # Reset point offer increase
                 POINT_ESCALATION_OFFERED = False
+                CLUES_OFFERED = 0
                 point_weight = POINT_DEFAULT_WEIGHT
 
                 if QUIZ_MODE == 'QA':
