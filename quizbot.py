@@ -135,7 +135,7 @@ def quiz_results(client, results_object, forced=False):
         score = result[0]
         user_id = result[1]
         correct_answers = results_object[user_id]['total_correct_answers']
-        result_output += "{pos} {medal}) <@{user}>, score: {score}. Correct answers: {answers} ({guess_percent:02.0f}% accuracy)\n".format(
+        result_output += "{pos} {medal}) <@{user}>, score: {score:.1f}. Correct answers: {answers} ({guess_percent:02.0f}% accuracy)\n".format(
             pos=ordinal(index+1),
             medal=podium_medal(index+1),
             user=user_id,
@@ -148,7 +148,7 @@ def quiz_results(client, results_object, forced=False):
         )
     bot_say('{}'.format(result_output))
     logger(results_object)
-    quit('Finished!')
+    quit(0)
 
 
 def bot_say(msg, channel=QUIZ_CHANNEL_ID):
@@ -222,10 +222,10 @@ def bot_reaction(msg_timestamp, emoji):
 
 
 def check_plural(num):
-    if num > 1:
-        return 's'
-    else:
+    if num == 1:
         return ''
+    else:
+        return 's'
 
 
 def ask_question(question_id):
@@ -301,6 +301,7 @@ if sc.rtm_connect(with_team_state=True):
                 time.sleep(WEBSOCKET_READLOOP_SLEEP)
                 continue  # Read next message
 
+            # Quick hack to avoid more work after Message became a class. Awaiting refactor
             (user, time_at, guess) = (message.user, message.time_at, message.guess)
 
             if 'results' in guess and user == QUIZ_MASTER:
