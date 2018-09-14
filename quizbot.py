@@ -234,7 +234,7 @@ def parse_message(read_line_object):
         if cleaned == 'remaining':
             bot_say(str(answers), channel)
 
-    logger('{time_now} - At {time_msg} User {user} says: {orig}. Cleaned: {cleaned}'.format(
+    logger("{time_now} - At {time_msg} User {user} says: '{orig}'. Cleaned: '{cleaned}'".format(
         user=user,
         time_now=time.time(),
         time_msg=time_at,
@@ -291,11 +291,12 @@ def check_plural(num):
 def ask_question(question_id):
     global answers
     for question, answer in json_data['questions'][question_id].items():
-        bot_say('Question {i}) {question}'.format(
+        bot_say('Question {i}) *{question}*'.format(
             i=question_id+1, question=question))
         # Set global
         answers = [answer[0].lower()]
-        print('Asking question #{}. Listening for answer: {}'.format(question_id,answers))
+        logger('Asking question #{}. Listening for answer: {}'.format(
+            question_id, answers))
 
 
 if sc.rtm_connect(with_team_state=True):
