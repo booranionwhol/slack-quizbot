@@ -18,7 +18,7 @@ with open('list_to_remove_vowels.txt') as file:
         # A letter on its own looks weird. Merge it to the previous block if found
         # TODO:
         # If the first word is 'The'. Merge the 'Th' to the right a bit randomly?
-        if len(result[-1]) == 1:
+        if len(result[-1]) == 1 and len(result) >= 2:
             last_block = result.pop(-1)
             result[-1] = result[-1]+last_block
 
