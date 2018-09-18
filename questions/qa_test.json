@@ -3,7 +3,7 @@
     "description": "Blizz blazz",
     "mode": "QA",
     "questions": [
-        {"question1": ["answer1 with space"]},
+        {"question1": ["answer1"]},
         {"question2": ["answer2"]}
     ]
 }
