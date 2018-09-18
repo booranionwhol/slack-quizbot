@@ -4,10 +4,14 @@ import random
 import os
 import json
 
+OFFLINE = True
 # bot
 slack_token = os.environ.get("SLACK_BOT_TOKEN", None)
-sc = SlackClient(slack_token)
-
+if OFFLINE:
+    import offline_simulator
+    sc = offline_simulator.SocketServer()
+else:
+    sc = SlackClient(slack_token)
 # channels = slack_api.api_call(
 #     "channels.list"
 # )
@@ -27,7 +31,7 @@ QUESTION_COUNT = 0
 REMAINING_QUESTIONS = 0
 answers = []
 answers_found = []
-with open('questions/four_letter_countries.json') as file:
+with open('questions/qa_test.json') as file:
     json_data = json.load(file)
     if json_data.get('mode') == 'QA':
         QUIZ_MODE = 'QA'
@@ -86,6 +90,8 @@ if CHEAT_TO_RESULTS:
 
 
 def get_username(user_id):
+    if OFFLINE:
+        return user_id
     global sc
     response = sc.api_call(
         "users.info",
@@ -151,10 +157,13 @@ def quiz_results(client, results_object, forced=False):
         )
     bot_say('{}'.format(result_output))
     logger(results_object)
-    quit(0)
+    quit()
 
 
 def bot_say(msg, channel=QUIZ_CHANNEL_ID):
+    if OFFLINE:
+        logger('bot_say: {}'.format(msg))
+        return
     sc.rtm_send_message(channel, msg)
 
 
@@ -184,7 +193,7 @@ def check_if_points_escalated():
                 MINUTES_NO_GUESSES, point_weight))
             logger('Point escalation offered at {}'.format(time.time()))
             POINT_ESCALATION_OFFERED = True
-    if time.time()-last_correct_answer >= float(MINUTES_UNTIL_CLUE*60) and CLUES_OFFERED == 0:
+    if time.time()-last_correct_answer >= float(MINUTES_UNTIL_CLUE*60) and CLUES_OFFERED == 0 and QUIZ_MODE == 'QA':
         point_weight = 0.5
         bot_say('There have not been any correct guesses in {} minutes. Next answer now worth {} points with a clue:'.format(
             MINUTES_UNTIL_CLUE, point_weight))
@@ -200,7 +209,7 @@ def check_if_points_escalated():
         ))
         logger('Clue offered at {}'.format(time.time()))
         CLUES_OFFERED = 1
-    if time.time()-last_correct_answer >= float(MINUTES_UNTIL_SECOND_CLUE*60) and CLUES_OFFERED == 1:
+    if time.time()-last_correct_answer >= float(MINUTES_UNTIL_SECOND_CLUE*60) and CLUES_OFFERED == 1 and QUIZ_MODE == 'QA':
         point_weight = 0.1
         bot_say('You are all terrible. No correct guesses in {} minutes. Next answer now worth {} points with a big clue:'.format(
             MINUTES_UNTIL_SECOND_CLUE, point_weight))
@@ -259,6 +268,7 @@ class Message:
                 results_object[self.user]['total_correct_answers'] = 0
                 results_object[self.user]['total_guesses'] = 0
             results_object[self.user]['total_guesses'] += 1
+        # Slack responds with 'ok' when we send a message.
         elif read_msg.get('ok', False):
             if read_msg.get('text').startswith('Question'):
                 self.is_question = True
@@ -297,6 +307,13 @@ def ask_question(question_id):
         answers = [answer[0].lower()]
         logger('Asking question #{}. Listening for answer: {}'.format(
             question_id, answers))
+
+    if OFFLINE:
+        # Normal flow is to set these times based on the confirmation response
+        # from Slack when we ask the question. Keep simple and just force to now()
+        global last_question_time, last_correct_answer
+        last_question_time = time.time()
+        last_correct_answer = last_question_time
 
 
 if sc.rtm_connect(with_team_state=True):
@@ -401,8 +418,7 @@ if sc.rtm_connect(with_team_state=True):
                 answers.remove(guess)
                 answers_found.append(guess)
                 if QUIZ_MODE != 'QA':
-                    sc.rtm_send_message(
-                        "#quiz", "There are {} answers left".format(len(answers)))
+                    bot_say("There are {} answers left".format(len(answers)))
 
                 # Reset point offer increase
                 POINT_ESCALATION_OFFERED = False
