@@ -3,8 +3,28 @@ import time
 import random
 import os
 import json
+import sys
 
-OFFLINE = True
+#
+# Config
+#
+OFFLINE = False  # Allow telnet interface to simulate chat
+# Without this, we might hit a rate-limit on the Slack RTM
+WEBSOCKET_READLOOP_SLEEP = 0.1
+# Point increase when nobody has guessed for X mins. Should mean the current question is hard
+MINUTES_NO_GUESSES = 1
+MINUTES_UNTIL_CLUE = 2  # Point decrease, and first clue offered
+MINUTES_UNTIL_SECOND_CLUE = 3  # Point decrease, second, bigger clue offered
+POINT_DEFAULT_WEIGHT = 1
+GOLDEN_ANSWER_POINTS = 3
+# Slack user Id of user who can issue commands
+QUIZ_MASTER = os.environ['QUIZ_MASTER']
+QUIZ_CHANNEL_ID = os.environ['QUIZ_CHANNEL_ID']  # The Quiz channel
+# For quick debug to go straight to a fake results table.
+CHEAT_TO_RESULTS = False
+QUESTION_FILE = 'questions/qa_test.json'
+
+
 # bot
 slack_token = os.environ.get("SLACK_BOT_TOKEN", None)
 if OFFLINE:
@@ -12,12 +32,6 @@ if OFFLINE:
     sc = offline_simulator.SocketServer()
 else:
     sc = SlackClient(slack_token)
-# channels = slack_api.api_call(
-#     "channels.list"
-# )
-
-# general: CC7EWCEAY
-# quiz: CCAMPJ57E
 
 
 def clean_answer(text):
@@ -26,51 +40,51 @@ def clean_answer(text):
     return text.lower()
 
 
+# Init some things. Should all go away with a future refactoring
 QUIZ_MODE = ''
 QUESTION_COUNT = 0
 REMAINING_QUESTIONS = 0
+POINT_ESCALATION_OFFERED = False
+CLUES_OFFERED = 0
+
 answers = []
 answers_found = []
-with open('questions/qa_test.json') as file:
+STARTING_ANSWER_COUNT = 0
+golden_answers = []  # Only used by a list style quiz
+
+def select_golden_answers():
+    random.seed(os.urandom(1024))
+    for _ in range(1, int(len(answers)/10)):
+        golden_random = random.choice(answers)
+        if golden_random not in golden_answers:
+            golden_answers.append(golden_random)
+
+
+# Load up the questions
+with open(QUESTION_FILE) as file:
     json_data = json.load(file)
     if json_data.get('mode') == 'QA':
         QUIZ_MODE = 'QA'
         CURRENT_QUESTION = 0
         QUESTION_COUNT = len(json_data['questions'])
         REMAINING_QUESTIONS = QUESTION_COUNT
-    else:
+    else:  # For now, just a list style quiz
         for answer in json_data['answers']:
             if answer != '':
                 answers.append(clean_answer(
                     answer.strip().replace('&', '&amp;')))
-STARTING_ANSWER_COUNT = len(answers)
-random.seed(os.urandom(1024))
-golden_answers = []
-for i in range(1, int(len(answers)/10)):
-    golden_random = random.choice(answers)
-    if golden_random not in golden_answers:
-        golden_answers.append(golden_random)
-# rand=random.randint(0, len(answers)-1)
+        STARTING_ANSWER_COUNT = len(answers)
+        select_golden_answers()
+
 print(answers)
 print('golden: {}'.format(golden_answers))
-# print(len(answers),rand,answers[rand])
 
-# raise SystemExit
-WEBSOCKET_READLOOP_SLEEP = 0.1
-POINT_ESCALATION_OFFERED = False
-CLUES_OFFERED = 0
-MINUTES_NO_GUESSES = 1
-MINUTES_UNTIL_CLUE = 2
-MINUTES_UNTIL_SECOND_CLUE = 3
+
 # As soon as the quiz starts, set the timer before there's a real guess.
 last_correct_answer = time.time()
-POINT_DEFAULT_WEIGHT = 1
-QUIZ_MASTER = os.environ['QUIZ_MASTER']
-GOLDEN_ANSWER_POINTS = 3
-QUIZ_CHANNEL_ID = os.environ['QUIZ_CHANNEL_ID']
+
 
 results_object = {}
-CHEAT_TO_RESULTS = False
 if CHEAT_TO_RESULTS:
     answers = []
     results_object = {
@@ -100,11 +114,9 @@ def get_username(user_id):
     return response['user']['profile']['display_name']
 
 
-# Taken from https://codereview.stackexchange.com/questions/41298/producing-ordinal-numbers
-SUFFIXES = {1: 'st', 2: 'nd', 3: 'rd'}
-
-
 def ordinal(num):
+    # Taken from https://codereview.stackexchange.com/questions/41298/producing-ordinal-numbers
+    SUFFIXES = {1: 'st', 2: 'nd', 3: 'rd'}
     # Checking for 10-20 because those are the digits that
     # don't follow the normal counting scheme.
     if 10 <= num % 100 <= 20:
@@ -157,7 +169,7 @@ def quiz_results(client, results_object, forced=False):
         )
     bot_say('{}'.format(result_output))
     logger(results_object)
-    quit()
+    sys.exit(0)
 
 
 def bot_say(msg, channel=QUIZ_CHANNEL_ID):
@@ -172,6 +184,7 @@ def goodbye():
 
 
 def find_vowels(line):
+    """ Find all the vowels in the answer, to use for clues """
     vowels = ['a', 'e', 'i', 'o', 'u']
     clue_list = []
     for letter in line.lower():
@@ -257,7 +270,9 @@ class Message:
     def __init__(self, read_msg):
         self.is_guess = False
         self.is_question = False
-
+        self.time_at = 0.0
+        self.user = ''
+        self.guess = ''  # message text after cleaning for quiz guess
         if read_msg.get('type') and read_msg.get('text'):
             self.is_guess = True
             (self.user, self.time_at,
@@ -268,7 +283,7 @@ class Message:
                 results_object[self.user]['total_correct_answers'] = 0
                 results_object[self.user]['total_guesses'] = 0
             results_object[self.user]['total_guesses'] += 1
-        # Slack responds with 'ok' when we send a message.
+        # Slack responds with 'ok' when the bot sends a message.
         elif read_msg.get('ok', False):
             if read_msg.get('text').startswith('Question'):
                 self.is_question = True
@@ -317,11 +332,6 @@ def ask_question(question_id):
 
 
 if sc.rtm_connect(with_team_state=True):
-    # sc.api_call(
-    #     "chat.postMessage",
-    #     channel='general',
-    #     text='sdasd'
-    # )
 
     while sc.server.connected is False:
         print('Waiting for connection..')
@@ -347,15 +357,8 @@ if sc.rtm_connect(with_team_state=True):
                 golden_points=GOLDEN_ANSWER_POINTS
             ))
 
-    # Returns "not_allowed_token_type". Apparently bots can't join channels, but have to be invited?
-    # r=sc.api_call(
-    #     "channels.join",
-    #     name="#quiz"
-    # )
-    # print(r)
-
+    # Sample message from Slack
     # [{'type': 'message', 'user': 'UC7HXJ319', 'text': 'a', 'client_msg_id': 'a898be5b-2cdf-40f4-b9c9-220b8c81b431', 'team': 'TC75G1A3B', 'channel': 'CCAMPJ57E', 'event_ts': '1534609801.000200', 'ts': '1534609801.000200'}]
-    i = 0
 
     # Main game loop
 
@@ -430,12 +433,6 @@ if sc.rtm_connect(with_team_state=True):
                     REMAINING_QUESTIONS = REMAINING_QUESTIONS-1
                     if REMAINING_QUESTIONS != 0:
                         ask_question(CURRENT_QUESTION)
-
-        # print(read)
-        i += 1
-        # if i < 10:
-        #     sc.rtm_send_message("#quiz", "test {}".format(i))
-
 
 else:
     print("Connection Failed")
