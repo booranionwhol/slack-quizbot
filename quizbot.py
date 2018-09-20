@@ -4,6 +4,7 @@ import random
 import os
 import json
 import sys
+from statistics import mean
 
 #
 # Config
@@ -51,6 +52,9 @@ answers = []
 answers_found = []
 STARTING_ANSWER_COUNT = 0
 golden_answers = []  # Only used by a list style quiz
+
+last_question_time = 0.0
+
 
 def select_golden_answers():
     random.seed(os.urandom(1024))
@@ -169,7 +173,11 @@ def quiz_results(client, results_object, forced=False):
             )
         result_output += '\n'
     bot_say('{}'.format(result_output))
-    logger(results_object)
+    logger(result_output)
+    fastest_time, fastest_user = Player.order_player_results(
+        order_attribute='fastest_answer', reverse=False)[0]
+    bot_say('Fastest anwswer time by <@{fastest_user}>: {fastest_time:.4f}s'.format(
+        fastest_user=fastest_user, fastest_time=fastest_time))
     Player.dump_instances()
     print('Results ordered by points: {}'.format(Player.order_player_results()))
     sys.exit(0)
@@ -259,7 +267,7 @@ def parse_message(read_line_object):
         if cleaned == 'remaining':
             bot_say(str(answers), channel)
 
-    logger("{time_now} - At {time_msg} User {user} says: '{orig}'. Cleaned: '{cleaned}'".format(
+    logger("{time_now} - At {time_msg} (event_ts: {event_ts}) User {user} says: '{orig}'. Cleaned: '{cleaned}'".format(
         user=user,
         time_now=time.time(),
         time_msg=time_at,
@@ -286,6 +294,13 @@ class Player:
 
         self.score += points
         self.total_correct_answers += 1
+
+    def answer_time(self, time):
+        self.answer_times.append(round(time, 4))
+        # Update fastest and average. These should probably be computed when read instead.
+        self.fastest_answer = min(self.answer_times)
+        self.average_answer_time = mean(self.answer_times)
+
     @staticmethod
     def load_player(user_id):
         if user_id in Player.instances:
@@ -316,12 +331,14 @@ class Message:
         self.is_guess = False
         self.is_question = False
         self.time_at = 0.0
+        self.event_ts = 0.0
         self.user = ''
         self.guess = ''  # message text after cleaning for quiz guess
         if read_msg.get('type') and read_msg.get('text'):
             self.is_guess = True
             (self.user, self.time_at,
                 self.guess) = parse_message([read_msg])
+            read_msg.get('event_ts', 0.0)
         # Slack responds with 'ok' when the bot sends a message.
         elif read_msg.get('ok', False):
             if read_msg.get('text').startswith('Question'):
@@ -449,6 +466,7 @@ if sc.rtm_connect(with_team_state=True):
                         guess, user, point_weight, plural=check_plural(point_weight)))
 
                 player.inc_score(point_weight)
+                player.answer_time(last_correct_answer-last_question_time)
 
                 bot_reaction(msg_timestamp=time_at,
                              emoji='heavy_check_mark')
