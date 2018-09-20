@@ -147,28 +147,31 @@ def quiz_results(client, results_object, forced=False):
     else:
         bot_say('Quiz over! The results are...')
 
-    results_to_sort = []
-    for user_id in results_object.keys():
-        # Make a set with (score, user_id). So the list of sets can be sorted.
-        results_to_sort.append((results_object[user_id]['score'], user_id))
     result_output = ""
-    for index, result in enumerate(sorted(results_to_sort, reverse=True)):
+    for index, result in enumerate(Player.order_player_results()):
         score = result[0]
         user_id = result[1]
-        correct_answers = results_object[user_id]['total_correct_answers']
-        result_output += "{pos} {medal}) <@{user}>, score: {score:.1f}. Correct answers: {answers} ({guess_percent:02.0f}% accuracy)\n".format(
+        player = Player.load_player(user_id)
+        result_output += "{pos} {medal}) <@{user}>, score: {score:.1f}.".format(
             pos=ordinal(index+1),
             medal=podium_medal(index+1),
             user=user_id,
-            score=score,
-            answers=correct_answers,
-            guess_percent=(
-                correct_answers /
-                results_object[user_id]['total_guesses'] *
-                100)
+            score=score
         )
+        if player.score > 0.0:
+            result_output += " Correct answers: {answers} ({guess_percent:02.0f}% accuracy). Average time: {avg:.4f}s".format(
+                answers=player.total_correct_answers,
+                guess_percent=(
+                    player.total_correct_answers /
+                    player.total_guesses *
+                    100),
+                avg=player.average_answer_time
+            )
+        result_output += '\n'
     bot_say('{}'.format(result_output))
     logger(results_object)
+    Player.dump_instances()
+    print('Results ordered by points: {}'.format(Player.order_player_results()))
     sys.exit(0)
 
 
@@ -266,6 +269,48 @@ def parse_message(read_line_object):
     return (user, time_at, cleaned)
 
 
+class Player:
+    instances = {}
+
+    def __init__(self, user_id):
+        self.user_id = user_id
+        self.fastest_answer = 0.0
+        self.answer_times = []
+        self.average_answer_time = 0.0
+        self.score = 0.0
+        self.total_guesses = 0
+        self.total_correct_answers = 0
+        Player.instances[user_id] = self
+
+    def inc_score(self, points):
+
+        self.score += points
+        self.total_correct_answers += 1
+    @staticmethod
+    def load_player(user_id):
+        if user_id in Player.instances:
+            # Return existing Player instance object
+            return Player.instances[user_id]
+        else:  # else make a new one
+            return Player(user_id)
+
+    @staticmethod
+    def dump_instances():
+        for user_id, player_instance in Player.instances.items():
+            print('User: {}. Vars: {}'.format(user_id, vars(player_instance)))
+
+    @staticmethod
+    def order_player_results(order_attribute='score', reverse=True):
+        results_table = []
+        for user_id, player_instance in Player.instances.items():
+            if user_id != QUIZ_MASTER:
+                results_table.append(
+                    (getattr(player_instance, order_attribute), user_id)
+                )
+        results_table.sort(reverse=reverse)
+        return results_table
+
+
 class Message:
     def __init__(self, read_msg):
         self.is_guess = False
@@ -277,12 +322,6 @@ class Message:
             self.is_guess = True
             (self.user, self.time_at,
                 self.guess) = parse_message([read_msg])
-            if self.user not in results_object:
-                results_object[self.user] = {}
-                results_object[self.user]['score'] = 0
-                results_object[self.user]['total_correct_answers'] = 0
-                results_object[self.user]['total_guesses'] = 0
-            results_object[self.user]['total_guesses'] += 1
         # Slack responds with 'ok' when the bot sends a message.
         elif read_msg.get('ok', False):
             if read_msg.get('text').startswith('Question'):
@@ -385,8 +424,12 @@ if sc.rtm_connect(with_team_state=True):
             # Quick hack to avoid more work after Message became a class. Awaiting refactor
             (user, time_at, guess) = (message.user, message.time_at, message.guess)
 
+            player = Player.load_player(user)
+
             if 'results' in guess and user == QUIZ_MASTER:
                 quiz_results(sc, results_object, forced=True)
+
+            player.total_guesses += 1
 
             # Answer was right, but already found
             if guess in answers_found:
@@ -397,25 +440,18 @@ if sc.rtm_connect(with_team_state=True):
                 last_correct_answer = float(time_at)
 
                 if guess in golden_answers:
+                    bot_reaction(msg_timestamp=time_at, emoji='tada')
                     point_weight = GOLDEN_ANSWER_POINTS
                     bot_say('A Golden answer was found! "{}" :tada: by user <@{}>. {} points!'.format(
                         guess, user, point_weight))
                 else:
                     bot_say('Answer found! "{}" by <@{}>. {} point{plural}!'.format(
                         guess, user, point_weight, plural=check_plural(point_weight)))
-                if user not in results_object:
-                    results_object[user] = {}
-                    results_object[user]['score'] = point_weight
-                    results_object[user]['total_correct_answers'] = 1
-                else:
-                    results_object[user]['score'] += point_weight
-                    results_object[user]['total_correct_answers'] += 1
+
+                player.inc_score(point_weight)
 
                 bot_reaction(msg_timestamp=time_at,
                              emoji='heavy_check_mark')
-
-                if guess in golden_answers:
-                    bot_reaction(msg_timestamp=time_at, emoji='tada')
 
                 # Not the best way if the list is huge? Or if there's dupes?
                 answers.remove(guess)
