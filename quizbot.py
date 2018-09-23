@@ -261,7 +261,7 @@ def parse_message(read_line_object):
     user = read_line_object[0]['user']
     time_at = read_line_object[0]['ts']
     channel = read_line_object[0]['channel']
-    event_ts = read_line_object[0].get('event_ts',None)
+    event_ts = read_line_object[0].get('event_ts', None)
     # Check if direct message
     if channel[0:2] == 'DC' and user == QUIZ_MASTER:
         logger('Private Message received from QUIZ_MASTER: {}'.format(cleaned))
@@ -321,9 +321,12 @@ class Player:
         results_table = []
         for user_id, player_instance in Player.instances.items():
             if user_id != QUIZ_MASTER:
-                results_table.append(
-                    (getattr(player_instance, order_attribute), user_id)
-                )
+                if order_attribute == 'fastest_answer' and player_instance.fastest_answer == 0.0:
+                    pass
+                else:
+                    results_table.append(
+                        (getattr(player_instance, order_attribute), user_id)
+                    )
         results_table.sort(reverse=reverse)
         return results_table
 
