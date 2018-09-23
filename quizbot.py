@@ -131,7 +131,7 @@ def ordinal(num):
     return str(num) + suffix
 
 
-def podium_medal(position):
+def podium_medal(position, total_player_results):
     if position == 1:
         return ':first_place_medal:'
     if position == 2:
@@ -139,7 +139,7 @@ def podium_medal(position):
     if position == 3:
         return ':third_place_medal:'
     # Last place
-    if position == len(results_object):
+    if position == len(total_player_results):
         return ':poop:'
     else:
         return ''
@@ -158,7 +158,7 @@ def quiz_results(client, results_object, forced=False):
         player = Player.load_player(user_id)
         result_output += "{pos} {medal}) <@{user}>, score: {score:.1f}.".format(
             pos=ordinal(index+1),
-            medal=podium_medal(index+1),
+            medal=podium_medal(index+1, Player.order_player_results()),
             user=user_id,
             score=score
         )
@@ -179,7 +179,9 @@ def quiz_results(client, results_object, forced=False):
     bot_say('Fastest anwswer time by <@{fastest_user}>: {fastest_time:.4f}s'.format(
         fastest_user=fastest_user, fastest_time=fastest_time))
     Player.dump_instances()
-    print('Results ordered by points: {}'.format(Player.order_player_results()))
+    logger('Players ordered by points: {}'.format(
+        Player.order_player_results()))
+    logger(result_output)
     sys.exit(0)
 
 
