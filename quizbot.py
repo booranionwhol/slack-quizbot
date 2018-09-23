@@ -261,6 +261,7 @@ def parse_message(read_line_object):
     user = read_line_object[0]['user']
     time_at = read_line_object[0]['ts']
     channel = read_line_object[0]['channel']
+    event_ts = read_line_object[0].get('event_ts',None)
     # Check if direct message
     if channel[0:2] == 'DC' and user == QUIZ_MASTER:
         logger('Private Message received from QUIZ_MASTER: {}'.format(cleaned))
@@ -272,6 +273,7 @@ def parse_message(read_line_object):
         time_now=time.time(),
         time_msg=time_at,
         orig=read_line_object[0]['text'],
+        event_ts=event_ts,
         cleaned=cleaned
     ))
     return (user, time_at, cleaned)
