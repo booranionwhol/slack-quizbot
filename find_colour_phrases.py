@@ -1,6 +1,8 @@
 import re
 from collections import Counter
+import json
 
+qa_dict = []
 colours = [
     'redXX',
     'green',
@@ -50,9 +52,17 @@ colours = [
     'ape',
     'tiger',
     'lion',
+    'donkey',
+    'parrot',
+    'rabbit',
+    'bear',
+    'wolf',
+    'goat',
+    'duck',
+    'goose'
 ]
 # Previously checked, remove from list to not waste time on retries
-colours_dont_exist=[
+colours_dont_exist = [
     'horse',
     'pig',
     'chicken',
@@ -63,24 +73,36 @@ colours_dont_exist=[
     'fish',
     'crow',
     'monkey',
-    'tiger'
+    'tiger',
+    'donkey',
+    'parrot',
+    'rabbit',
+    'wolf',
+    'duck',
+    'goose'
 ]
-colours_too_common=[
+colours_too_common = [
     'ape',
     'bee',
-    'rat'
+    'rat',
+    'wasp',
+    'dog',
+    'toad'
 ]
 # Make the list shorter
 for remove in colours_dont_exist+colours_too_common:
     colours.remove(remove)
-counter=[]
+counter = []
 strip_chars = ['\'', ':', ';', '-', '.', '!', '?']
 BACKWARDS = False
 with open('shakespeare_complete.txt', encoding='utf-8') as file:
     for line in file:
         answers = []
         question = line.strip()
-        if len(question) <= 15:
+        if len(question) <= 25:
+            continue
+
+        if sum(1 for c in question if c.isupper()) / len(question.replace(' ', '')) > 0.7:
             continue
         question_cleaned = question
         for char in strip_chars:
@@ -112,7 +134,10 @@ with open('shakespeare_complete.txt', encoding='utf-8') as file:
                 if BACKWARDS and colour not in answers:
                     answers.append(colour)
         if len(answers) >= 1:
+            question_dict = {question: answers}
+            qa_dict.append(question_dict)
             for answer in answers:
                 counter.append(answer)
             print(question, answers)
 print(Counter(counter).most_common())
+print(json.dumps(qa_dict))
