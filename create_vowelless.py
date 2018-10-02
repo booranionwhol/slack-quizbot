@@ -1,8 +1,8 @@
 import json
 
-qa_dict=[]
-vowels = ['a', 'e', 'i', 'o', 'u', ' ']
-with open('list_to_remove_vowels.txt') as file:
+qa_dict = []
+vowels = ['a', 'e', 'i', 'o', 'u', ' ', '.', '\'']
+with open('oscar_vowels.txt') as file:
     for line in file:
         answer = line.rstrip()
         line = answer.lower()
@@ -22,9 +22,9 @@ with open('list_to_remove_vowels.txt') as file:
             last_block = result.pop(-1)
             result[-1] = result[-1]+last_block
 
-        cryptic=' '.join(result).upper()
-        #print(cryptic)
+        cryptic = ' '.join(result).upper()
+        # print(cryptic)
         #print('{"{}}": ["{}}"]},'.format(cryptic,answer))
-        question_dict={cryptic:[answer]}
+        question_dict = {cryptic: [answer]}
         qa_dict.append(question_dict)
 print(json.dumps(qa_dict))
