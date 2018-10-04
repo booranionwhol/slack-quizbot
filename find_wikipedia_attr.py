@@ -46,6 +46,15 @@ def remove_reference_links(data):
     return data
 
 
+def replace_attrib_image(data):
+    # Example: Population - Total in Minsk
+    img_tag = data.find('img')
+    if img_tag:
+        if len(img_tag.attrs.get('alt')) >= 1:
+            data.img.replace_with(img_tag.attrs.get('alt'))
+    return data
+
+
 for row in info.find_all(name='tr'):
     # print(f"row: {row}")
 
@@ -60,6 +69,9 @@ for row in info.find_all(name='tr'):
 
     leftcell = row.find('th')
     if leftcell:
+        # Córdoba, Argentina had an odd blank row in the Population
+        if len(leftcell.get_text()) <= 2:
+            continue
         if leftcell.attrs.get('colspan') == '2':
             # next row will be a sub category
             leftcell = remove_reference_links(leftcell)
@@ -69,9 +81,12 @@ for row in info.find_all(name='tr'):
             attrib = leftcell.get_text().strip()
             # Strips superscript etc.
             rightcell = row.find('td')
+            if leftcell.get_text() != 'Country':
+                # This still messes up the original. Should it make a deepcopy first?
+                rightcell_orig = replace_attrib_image(rightcell)
+            rightcell_orig = rightcell.get_text().strip()
             rightcell = remove_reference_links(rightcell)
             rightcell = rightcell.get_text().strip()
-            print(f"{parent_attrib} - {attrib}: {rightcell}")
             if parent_attrib in accepted_parents or attrib in accepted_attribs or str(parent_attrib).startswith('Population'):
                 # Some cells have newlines. Eg. GDP for Dhaka, Bangladesh
                 if 'Ethnic' not in attrib and '\n' not in rightcell:
