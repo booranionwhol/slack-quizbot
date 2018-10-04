@@ -15,6 +15,9 @@ def main(url):
 
     soup = BeautifulSoup(html, 'html.parser')
     info = soup.find(name='table', attrs={'class': 'infobox geography vcard'})
+    if not info:
+        print("Couldn't find infobox card")
+        return None
     # print(str(info))
     # info=BeautifulSoup("""
     # <tr class="mergedtoprow"><th colspan="2" style="text-align:center;text-align:left">Area<span style="font-weight:normal"></span></th></tr>
@@ -102,5 +105,5 @@ def main(url):
 
     return questions_attribs
 if __name__ == "__main__":
-    url = 'https://en.wikipedia.org/w/api.php?action=parse&page=Minsk&format=json'
+    url = 'https://en.wikipedia.org/w/api.php?action=parse&page=Chi%C5%9Fin%C4%83u&format=json'
     main(url)
