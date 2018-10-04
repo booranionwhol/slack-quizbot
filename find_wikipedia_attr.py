@@ -2,7 +2,7 @@ import requests
 import json
 from bs4 import BeautifulSoup
 
-url = 'https://en.wikipedia.org/w/api.php?action=parse&page=Switzerland&format=json'
+url = 'https://en.wikipedia.org/w/api.php?action=parse&page=Minsk&format=json'
 
 r = requests.get(url)
 # print(r.headers)
@@ -22,6 +22,22 @@ info = soup.find(name='table', attrs={'class': 'infobox geography vcard'})
 # """,'html.parser')
 # print(info)
 parent_attrib = None
+
+accepted_parents = ['Area', 'Population']
+accepted_attribs = [
+    'Parish',
+    'Established',
+    'Named for',
+    'Founded',
+    'Elevation',
+    'Highest elevation',
+    'Lowest elevation',
+    'Demonym(s)',
+    'GDP',
+    'GDP per capita',
+    'Area code(s)',
+    'Postal code'
+]
 
 
 def remove_reference_links(data):
@@ -56,3 +72,8 @@ for row in info.find_all(name='tr'):
             rightcell = remove_reference_links(rightcell)
             rightcell = rightcell.get_text().strip()
             print(f"{parent_attrib} - {attrib}: {rightcell}")
+            if parent_attrib in accepted_parents or attrib in accepted_attribs or str(parent_attrib).startswith('Population'):
+                # Some cells have newlines. Eg. GDP for Dhaka, Bangladesh
+                if 'Ethnic' not in attrib and '\n' not in rightcell:
+                    print(
+                        f"{parent_attrib} - {attrib}: '{rightcell}' ({rightcell_orig})")
