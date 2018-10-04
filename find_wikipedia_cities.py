@@ -1,5 +1,8 @@
 import requests
 import json
+from random import randint
+import random
+import find_wikipedia_attr
 from bs4 import BeautifulSoup
 
 url = 'https://en.wikipedia.org/w/api.php?action=parse&page=List_of_countries_by_national_capital%2C_largest_and_second-largest_cities&format=json'
@@ -46,8 +49,7 @@ country_list_table2 = BeautifulSoup("""
 """, 'html.parser')
 table_body = country_list_table.find(name='tbody')
 
-# print(info)
-parent_attrib = None
+list_of_countries = []
 
 
 def remove_reference_links(data):
@@ -108,5 +110,55 @@ for row in table_body.find_all(name='tr', recursive=False):
 
         second_city_link, second_city_text = get_city_link(second_city_cell)
 
+        list_of_countries.append(
+            {
+                "country": country_text,
+                "capital": capital_text,
+                "capital_link": capital_link,
+                "largest_city": largest_city_text,
+                "largest_city_link": largest_city_link,
+                "second_largest_city": second_city_text,
+                "second_largest_city_link": second_city_link
+            }
+        )
         print(
             f'{country_text} - Cap: {capital_text} ({capital_link}) Large: {largest_city_text} Second: {second_city_text} ({second_city_link})')
+
+questions_list = []
+list_of_chosen_countries = []
+# Choose country randomly
+for i in range(10):
+    country = random.choice(list_of_countries)
+    list_of_chosen_countries.append(country)
+
+for country in list_of_chosen_countries:
+    print(country)
+    country_text = country['country']
+    # 20% chance of second largest city
+    if random.random() <= 0.20:
+        city = country['second_largest_city']
+        city_link = country['second_largest_city_link']
+        city_q = 'second largest'
+        if city is None:
+            city = country['largest_city']
+            city_link = country['largest_city_link']
+            city_q = 'largest'
+    else:
+        city = country['largest_city']
+        city_link = country['largest_city_link']
+        city_q = 'largest'
+
+    print(city, city_link)
+    city_link_page = city_link.replace('/wiki/', '')
+    url = f'https://en.wikipedia.org/w/api.php?action=parse&page={city_link_page}&format=json'
+    city_attribs = find_wikipedia_attr.main(url)
+    if city_attribs is None:
+        continue
+    attrib = random.choice(city_attribs)
+    attrib_q = attrib['question']
+    attrib_answers = attrib['answers']
+    attrib_answers.append('CLUE'+city)
+    question_text = f'In the {city_q} city of *{country_text}*. What is the *{attrib_q}*'
+    questions_list.append({question_text: attrib_answers})
+
+print(json.dumps(questions_list))
