@@ -65,7 +65,7 @@ def select_golden_answers():
 
 
 # Load up the questions
-with open(QUESTION_FILE) as file:
+with open(QUESTION_FILE,encoding='utf-8') as file:
     json_data = json.load(file)
     if json_data.get('mode') == 'QA':
         QUIZ_MODE = 'QA'
@@ -382,7 +382,7 @@ def ask_question(question_id):
         bot_say('Question {i}) *{question}*'.format(
             i=question_id+1, question=question))
         # Set global
-        answers = [answer[0].lower()]
+        answers = [x.lower() for x in answer]
         logger('Asking question #{}. Listening for answer: {}'.format(
             question_id, answers))
 
