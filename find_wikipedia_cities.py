@@ -2,18 +2,18 @@ import requests
 import json
 from bs4 import BeautifulSoup
 
-# url = 'https://en.wikipedia.org/w/api.php?action=parse&page=List_of_countries_by_national_capital%2C_largest_and_second-largest_cities&format=json'
+url = 'https://en.wikipedia.org/w/api.php?action=parse&page=List_of_countries_by_national_capital%2C_largest_and_second-largest_cities&format=json'
 
-# r = requests.get(url)
-# content = r.content.decode('utf-8', 'ignore')
+r = requests.get(url)
+content = r.content.decode('utf-8', 'ignore')
 
-# json = json.loads(content)
-# html = json['parse']['text']['*']
+json = json.loads(content)
+html = json['parse']['text']['*']
 
-# soup = BeautifulSoup(html, 'html.parser')
-# country_list_table = soup.find(name='table', attrs={'class': 'wikitable sortable'})
-# print(str(info))
-country_list_table = BeautifulSoup("""
+soup = BeautifulSoup(html, 'html.parser')
+country_list_table = soup.find(
+    name='table', attrs={'class': 'wikitable sortable'})
+country_list_table2 = BeautifulSoup("""
 <table class="wikitable sortable">
 <tbody><tr><th rowspan="4">Country or territory</th>
 <th rowspan="4">Capital</th><th colspan="2"><a href="/wiki/City_proper" title="City proper">City proper</a></th><th rowspan="4">Source</th></tr>
@@ -56,31 +56,57 @@ def remove_reference_links(data):
     return data
 
 
-for row in table_body.find_all(name='tr'):
-    if row.contents[0].name == 'th':
+def get_city_link(cell):
+    try:
+        link = cell.a.get('href', None)
+        if link.startswith('/w/index.php'):
+            # The city has no wikipedia page. Ignore it.
+            link = None
+        text = cell.a.get_text()
+    except AttributeError:
+        link = None
+        text = None
+    return (link, text)
+
+
+# This loop intended to iterate through all countries
+# Countries with disputed cities end up having multiple rows
+for row in table_body.find_all(name='tr', recursive=False):
+    if row.find_all('th'):
         continue
 
     # Get first cell, then navigate sideways
     country_cell = row.find(name='td')
-    country_link = country_cell.a['href']
-    country_text = country_cell.a.get_text()
 
-    capital_cell = country_cell.find_next_sibling('td')
-    capital_link = capital_cell.a.get('href', None)
-    capital_text = capital_cell.a.get_text()
-
-    if capital_cell.attrs.get('colspan') == '2':
-        largest_city_link = capital_link
-        largest_city_text = capital_text
-        second_city_cell = capital_cell.find_next_sibling('td')
+    if not country_cell.find(name='span', attrs={'class': 'flagicon'}):
+        # We've somehow got in a row that isn't a country. Get out of here
+        continue
     else:
-        largest_city_cell = capital_cell.find_next_sibling('td')
-        largest_city_link = largest_city_cell.a.get('href', None)
-        largest_city_text = largest_city_cell.a.get_text()
-        second_city_cell = largest_city_cell.find_next_sibling('td')
+        country_link = country_cell.a['href']
+        country_text = country_cell.a.get_text()
 
-    second_city_link = second_city_cell.a.get('href', None)
-    second_city_text = second_city_cell.a.get_text()
+        # If the country spans two rows, then either largest or second largest is disputed
+        # Skip this country entirely to avoid confusion
+        if country_cell.attrs.get('rowspan') == '2':
+            print(
+                f'Skipping country {country_text} - Confusion over large cities')
+            continue
 
-    print(
-        f'Cap: {capital_text} Large: {largest_city_text} Second: {second_city_text}')
+        capital_cell = country_cell.find_next_sibling('td')
+
+        capital_link, capital_text = get_city_link(capital_cell)
+
+        if capital_cell.attrs.get('colspan') == '2':
+            largest_city_link = capital_link
+            largest_city_text = capital_text
+            second_city_cell = capital_cell.find_next_sibling('td')
+        else:
+            largest_city_cell = capital_cell.find_next_sibling('td')
+            largest_city_link, largest_city_text = get_city_link(
+                largest_city_cell)
+            second_city_cell = largest_city_cell.find_next_sibling('td')
+
+        second_city_link, second_city_text = get_city_link(second_city_cell)
+
+        print(
+            f'{country_text} - Cap: {capital_text} ({capital_link}) Large: {largest_city_text} Second: {second_city_text} ({second_city_link})')
