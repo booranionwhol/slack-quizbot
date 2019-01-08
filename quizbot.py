@@ -431,6 +431,8 @@ def ask_question(question_id):
         answers = [x.lower() for x in answer]
         logger('Asking question #{}. Listening for answer: {}'.format(
             question_id, answers))
+        # PM QUIZ_MASTER (hardcoded channel for now)
+        bot_say(f'Asked question {question} for answer: {answers}','DDP4JPC9G')
 
     if OFFLINE:
         # Normal flow is to set these times based on the confirmation response
