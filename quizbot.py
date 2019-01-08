@@ -225,18 +225,24 @@ def check_if_points_escalated():
             POINT_ESCALATION_OFFERED = True
     if time.time()-last_correct_answer >= float(SECONDS_UNTIL_CLUE) and CLUES_OFFERED == 0 and QUIZ_MODE == 'QA':
         point_weight = 0.5
-
-        for question, answer in json_data['questions'][CURRENT_QUESTION].items():
-            # There should only be one question object.
-            vowels_clue_list = find_vowels(answer[0])
-            vowels_clue = ' '.join(vowels_clue_list[0:2])
-
-        bot_say('The first two vowels for *{question}* are: *{vowels}*'.format(
-            question=question,
-            vowels=vowels_clue.upper()
-        ))
         bot_say('There have not been any correct guesses in {} seconds. Next answer now worth {} points with a clue:'.format(
             SECONDS_UNTIL_CLUE, point_weight))
+
+        if 'Anagrams' in json_data['title']:
+            for question, answer in json_data['questions'][CURRENT_QUESTION].items():
+                # There should only be one question object.
+                first_letter=answer[0][0].upper()
+            bot_say(f'The first letter for *{question}* is *{first_letter}*')
+        else:
+            for question, answer in json_data['questions'][CURRENT_QUESTION].items():
+                # There should only be one question object.
+                vowels_clue_list = find_vowels(answer[0])
+                vowels_clue = ' '.join(vowels_clue_list[0:2])
+
+            bot_say('The first two vowels for *{question}* are: *{vowels}*'.format(
+                question=question,
+                vowels=vowels_clue.upper()
+            ))
         logger('Clue offered at {}'.format(time.time()))
         CLUES_OFFERED = 1
     if time.time()-last_correct_answer >= float(SECONDS_UNTIL_SECOND_CLUE) and CLUES_OFFERED == 1 and QUIZ_MODE == 'QA':
