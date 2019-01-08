@@ -451,7 +451,7 @@ if sc.rtm_connect(with_team_state=True):
                 total=QUESTION_COUNT,
                 description=json_data['description']
             ))
-            time.sleep(3)
+            time.sleep(12)
             last_correct_answer = time.time()
             ask_question(CURRENT_QUESTION)
         else:
@@ -536,6 +536,7 @@ if sc.rtm_connect(with_team_state=True):
                     CURRENT_QUESTION = CURRENT_QUESTION+1
                     REMAINING_QUESTIONS = REMAINING_QUESTIONS-1
                     if REMAINING_QUESTIONS != 0:
+                        time.sleep(5)
                         ask_question(CURRENT_QUESTION)
 
 else:
