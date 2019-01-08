@@ -250,7 +250,7 @@ def check_if_points_escalated():
 
         bot_say('The *first half* of *{question}* is: *{clue}*'.format(
             question=question,
-            clue=answer[0:round(len(answer)/2)]
+            clue=answer[0:round(len(answer)/2)].title()
         ))
         logger('Second Clue offered at {}'.format(time.time()))
         CLUES_OFFERED = 2
@@ -452,7 +452,7 @@ if sc.rtm_connect(with_team_state=True):
         # Without the sleep, connected seems to be true, but a message can't be sent?
         time.sleep(1)
         if QUIZ_MODE == 'QA':
-            bot_say('<!here> Quiz starting. *{title}* - {description}.\n\nThere are *{total}* total questions.'.format(
+            bot_say('<!here> Quiz starting. {title} - {description}.\n\nThere are *{total}* total questions.'.format(
                 title=json_data['title'],
                 total=QUESTION_COUNT,
                 description=json_data['description']
