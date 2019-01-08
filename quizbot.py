@@ -13,9 +13,9 @@ OFFLINE = False  # Allow telnet interface to simulate chat
 # Without this, we might hit a rate-limit on the Slack RTM
 WEBSOCKET_READLOOP_SLEEP = 0.1
 # Point increase when nobody has guessed for X mins. Should mean the current question is hard
-MINUTES_NO_GUESSES = 1
-MINUTES_UNTIL_CLUE = 2  # Point decrease, and first clue offered
-MINUTES_UNTIL_SECOND_CLUE = 3  # Point decrease, second, bigger clue offered
+SECONDS_NO_GUESSES = 30
+SECONDS_UNTIL_CLUE = 60  # Point decrease, and first clue offered
+SECONDS_UNTIL_SECOND_CLUE = 90  # Point decrease, second, bigger clue offered
 POINT_DEFAULT_WEIGHT = 1
 GOLDEN_ANSWER_POINTS = 3
 # Slack user Id of user who can issue commands
@@ -212,14 +212,14 @@ def check_if_points_escalated():
 
     if POINT_ESCALATION_OFFERED is False and CLUES_OFFERED is 0:
         point_weight = POINT_DEFAULT_WEIGHT
-    if time.time()-last_correct_answer >= float(MINUTES_NO_GUESSES*60):
+    if time.time()-last_correct_answer >= float(SECONDS_NO_GUESSES):
         if POINT_ESCALATION_OFFERED is False:
             point_weight = 2
-            bot_say('There have not been any correct guesses in {} minutes. Next correct answer worth {} points!'.format(
-                MINUTES_NO_GUESSES, point_weight))
+            bot_say('There have not been any correct guesses in {} seconds. Next correct answer worth {} points!'.format(
+                SECONDS_NO_GUESSES, point_weight))
             logger('Point escalation offered at {}'.format(time.time()))
             POINT_ESCALATION_OFFERED = True
-    if time.time()-last_correct_answer >= float(MINUTES_UNTIL_CLUE*60) and CLUES_OFFERED == 0 and QUIZ_MODE == 'QA':
+    if time.time()-last_correct_answer >= float(SECONDS_UNTIL_CLUE) and CLUES_OFFERED == 0 and QUIZ_MODE == 'QA':
         point_weight = 0.5
         bot_say('There have not been any correct guesses in {} minutes. Next answer now worth {} points with a clue:'.format(
             MINUTES_UNTIL_CLUE, point_weight))
@@ -235,10 +235,10 @@ def check_if_points_escalated():
         ))
         logger('Clue offered at {}'.format(time.time()))
         CLUES_OFFERED = 1
-    if time.time()-last_correct_answer >= float(MINUTES_UNTIL_SECOND_CLUE*60) and CLUES_OFFERED == 1 and QUIZ_MODE == 'QA':
+    if time.time()-last_correct_answer >= float(SECONDS_UNTIL_SECOND_CLUE) and CLUES_OFFERED == 1 and QUIZ_MODE == 'QA':
         point_weight = 0.1
-        bot_say('You are all terrible. No correct guesses in {} minutes. Next answer now worth {} points with a big clue:'.format(
-            MINUTES_UNTIL_SECOND_CLUE, point_weight))
+        bot_say('You are all terrible. No correct guesses in {} seconds. Next answer now worth {} points with a big clue:'.format(
+            SECONDS_UNTIL_SECOND_CLUE, point_weight))
 
         for question, answer in json_data['questions'][CURRENT_QUESTION].items():
             # There should only be one question object.
