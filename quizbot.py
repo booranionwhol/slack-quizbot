@@ -422,7 +422,7 @@ def ask_question(question_id):
     global answers
     for question, answer in json_data['questions'][question_id].items():
         bot_say('Question {i}) *{question}*'.format(
-            i=question_id+1, question=question))
+            i=question_id+1, question=check_for_pablo(question)))
         # Set global
         answers = [x.lower() for x in answer]
         logger('Asking question #{}. Listening for answer: {}'.format(
