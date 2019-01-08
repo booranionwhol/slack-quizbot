@@ -274,7 +274,8 @@ def parse_message(read_line_object):
     channel = read_line_object[0]['channel']
     event_ts = read_line_object[0].get('event_ts', None)
     # Check if direct message
-    if channel[0:2] == 'DC' and user == QUIZ_MASTER:
+    #print(f'C: {channel}, u: {user}')
+    if (channel[0:2] == 'DC' or channel[0:2] == 'DD') and user == QUIZ_MASTER:
         logger('Private Message received from QUIZ_MASTER: {}'.format(cleaned))
         if cleaned == 'remaining':
             bot_say(str(answers), channel)
@@ -286,6 +287,9 @@ def parse_message(read_line_object):
             global ANTIPABLO_LETTERS
             ANTIPABLO_LETTERS = toggle(ANTIPABLO_LETTERS)
             print(f'Setting ANTIPABLO_LETTERS to {ANTIPABLO_LETTERS}')
+        if cleaned.startswith('say'):
+            bot_say('<!here> ' + read_line_object[0]['text'][4:])
+
 
     logger("{time_now} - At {time_msg} (event_ts: {event_ts}) User {user} says: '{orig}'. Cleaned: '{cleaned}'".format(
         user=user,
