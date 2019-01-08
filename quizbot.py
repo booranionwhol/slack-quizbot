@@ -225,8 +225,6 @@ def check_if_points_escalated():
             POINT_ESCALATION_OFFERED = True
     if time.time()-last_correct_answer >= float(SECONDS_UNTIL_CLUE) and CLUES_OFFERED == 0 and QUIZ_MODE == 'QA':
         point_weight = 0.5
-        bot_say('There have not been any correct guesses in {} minutes. Next answer now worth {} points with a clue:'.format(
-            MINUTES_UNTIL_CLUE, point_weight))
 
         for question, answer in json_data['questions'][CURRENT_QUESTION].items():
             # There should only be one question object.
@@ -237,6 +235,8 @@ def check_if_points_escalated():
             question=question,
             vowels=vowels_clue.upper()
         ))
+        bot_say('There have not been any correct guesses in {} seconds. Next answer now worth {} points with a clue:'.format(
+            SECONDS_UNTIL_CLUE, point_weight))
         logger('Clue offered at {}'.format(time.time()))
         CLUES_OFFERED = 1
     if time.time()-last_correct_answer >= float(SECONDS_UNTIL_SECOND_CLUE) and CLUES_OFFERED == 1 and QUIZ_MODE == 'QA':
