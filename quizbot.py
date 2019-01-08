@@ -54,6 +54,11 @@ STARTING_ANSWER_COUNT = 0
 golden_answers = []  # Only used by a list style quiz
 
 last_question_time = 0.0
+# Set the first correct answer time after the first question is asked.
+last_correct_answer = 0.0
+
+ANTIPABLO_SPACE = False
+ANTIPABLO_LETTERS = False
 
 
 def select_golden_answers():
@@ -84,8 +89,7 @@ print(answers)
 print('golden: {}'.format(golden_answers))
 
 
-# As soon as the quiz starts, set the timer before there's a real guess.
-last_correct_answer = time.time()
+
 
 
 results_object = {}
@@ -257,6 +261,11 @@ def check_if_points_escalated():
 def logger(msg):
     print(msg)
 
+def toggle(var):
+    if var == True:
+        return False
+    if var == False:
+        return True
 
 def parse_message(read_line_object):
     cleaned = clean_answer(read_line_object[0]['text'])
@@ -269,6 +278,14 @@ def parse_message(read_line_object):
         logger('Private Message received from QUIZ_MASTER: {}'.format(cleaned))
         if cleaned == 'remaining':
             bot_say(str(answers), channel)
+        if cleaned == 'space':
+            global ANTIPABLO_SPACE
+            ANTIPABLO_SPACE = toggle(ANTIPABLO_SPACE)
+            print(f'Setting ANTIPABLO_SPACE to {ANTIPABLO_SPACE}')
+        if cleaned == 'letter':
+            global ANTIPABLO_LETTERS
+            ANTIPABLO_LETTERS = toggle(ANTIPABLO_LETTERS)
+            print(f'Setting ANTIPABLO_LETTERS to {ANTIPABLO_LETTERS}')
 
     logger("{time_now} - At {time_msg} (event_ts: {event_ts}) User {user} says: '{orig}'. Cleaned: '{cleaned}'".format(
         user=user,
@@ -359,6 +376,31 @@ class Message:
                 last_correct_answer = last_question_time
                 logger('Question asked at {}'.format(self.time_at))
 
+UNICODE_SWAPS = {
+    "H": ["\u041D"],
+    "T": ['\u0422'],
+    'B': ['\u0412'],
+    'K': ['\u039A'],
+    'N': ['\u039D'],
+    'M': ['\u041C'],
+    'S': ['\u0405']
+}
+
+def check_for_pablo(question):
+    if ANTIPABLO_SPACE:
+        question = question.replace(' ', u'\u2005')
+    if ANTIPABLO_LETTERS:
+        unicode_available = []
+        # Build list of letter suitable to replace
+        for index, letter in enumerate(question):
+            if letter in UNICODE_SWAPS:
+                unicode_available.append((index, letter))
+        if len(unicode_available) >= 1:
+            pos, letter = random.choice(unicode_available)
+            replacement = random.choice(UNICODE_SWAPS[letter])
+            question = question[:pos] + replacement + question[pos+1:]
+    return question
+
 
 def bot_reaction(msg_timestamp, emoji):
     sc.api_call(
@@ -410,6 +452,7 @@ if sc.rtm_connect(with_team_state=True):
                 description=json_data['description']
             ))
             time.sleep(3)
+            last_correct_answer = time.time()
             ask_question(CURRENT_QUESTION)
         else:
             bot_say('<!here> Quiz starting. *{title}* - {description}.\n\nThere are *{total}* total answers. *{goldens} golden answers* :tada: worth *{golden_points}* points :moneybag: each. Chosen at random.'.format(
