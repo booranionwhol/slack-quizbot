@@ -1,0 +1,128 @@
+[
+    {
+        "In the largest city of *Syria*. What is the *Elevation*": [
+            "379 m (1,243 ft)",
+            "379 m (1,243 ft)",
+            "CLUEAleppo"
+        ]
+    },
+    {
+        "In the largest city of *Artsakh*. What is the *Population (2015) - Density*": [
+            "1,900/km2 (4,900/sq mi)",
+            "1,900/km2 (4,900/sq mi)",
+            "CLUEStepanakert"
+        ]
+    },
+    {
+        "In the largest city of *Afghanistan*. What is the *Postal code*": [
+            "100X, 101X, 105X, 106X",
+            "100X, 101X, 105X, 106X",
+            "CLUEKabul"
+        ]
+    },
+    {
+        "In the largest city of *Morocco*. What is the *Population (2014) - Rank*": [
+            "1st in Morocco",
+            "1st in Morocco",
+            "CLUECasablanca"
+        ]
+    },
+    {
+        "In the largest city of *Liechtenstein*. What is the *Postal code*": [
+            "9494",
+            "9494",
+            "CLUESchaan"
+        ]
+    },
+    {
+        "In the second largest city of *Botswana*. What is the *Elevation*": [
+            "1,001 m (3,284 ft)",
+            "1,001 m (3,284 ft)",
+            "CLUEFrancistown"
+        ]
+    },
+    {
+        "In the second largest city of *Greenland*. What is the *Population (2018) - Total*": [
+            "5,524",
+            "5,524",
+            "CLUESisimiut"
+        ]
+    },
+    {
+        "In the largest city of *Cape Verde*. What is the *Population (2017 estimate) - Density*": [
+            "1,600/km2 (4,000/sq mi)",
+            "1,600/km2 (4,000/sq mi)",
+            "CLUEPraia"
+        ]
+    },
+    {
+        "In the largest city of *Congo, Democratic Republic of the*. What is the *Population (2017) - Urban*": [
+            "11,855,000",
+            "11,855,000",
+            "CLUEKinshasa"
+        ]
+    },
+    {
+        "In the largest city of *Bosnia and Herzegovina*. What is the *Elevation*": [
+            "550 m (1,800 ft)",
+            "550 m (1,800 ft)",
+            "CLUESarajevo"
+        ]
+    },
+    {
+        "In the largest city of *Pakistan*. What is the *Demonym(s)*": [
+            "Karachiite",
+            "Karachiite",
+            "CLUEKarachi"
+        ]
+    },
+    {
+        "In the largest city of *Egypt*. What is the *Population (2017) - Density*": [
+            "19,376/km2 (50,180/sq mi)",
+            "19,376/km2 (50,180/sq mi)",
+            "CLUECairo"
+        ]
+    },
+    {
+        "In the largest city of *Nicaragua*. What is the *Population (2016 estimate) - Urban*": [
+            "1,033,622",
+            "1,033,622",
+            "CLUEManagua"
+        ]
+    },
+    {
+        "In the largest city of *Gabon*. What is the *Population (2013 census) - City*": [
+            "703,904",
+            "703,904",
+            "CLUELibreville"
+        ]
+    },
+    {
+        "In the largest city of *Bahrain*. What is the *Population - Density*": [
+            "5,200/km2 (13,000/sq mi)",
+            "5,200/km2 (13,000/sq mi)",
+            "CLUEManama"
+        ]
+    },
+    {
+        "In the largest city of *Albania*. What is the *Area - Administrative Unit*": [
+            "41.8 km2 (16.1 sq mi)",
+            "41.8 km2 (16.1 sq mi)",
+            "CLUETirana"
+        ]
+    },
+    {
+        "In the largest city of *Austria*. What is the *Population (1 January 2018) - Density*": [
+            "4,326.1/km2 (11,205/sq mi)",
+            "4,326.1/km2 (11,205/sq mi)",
+            "CLUEVienna"
+        ]
+    },
+    {
+        "In the largest city of *Singapore*. What is the *Area - Total*": [
+            "721.5 km2 (278.6 sq mi) (176th)",
+            "721.5 km2 (278.6 sq mi)[4] (176th)",
+            "CLUESingapore"
+        ]
+    }
+]

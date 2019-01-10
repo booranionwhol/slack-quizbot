@@ -1,0 +1,127 @@
+{
+    "title": "Movie Title - NVWLS",
+    "description": "Popular Movies from the last 20 years. Vowels removed. Spaces randomised.",
+    "mode": "QA",
+    "questions": [
+        {
+            "MSSN MPSS BLGH STPR TCL": [
+                "Mission Impossible Ghost Protocol"
+            ]
+        },
+        {
+            "LCN WND RLND": [
+                "Alice in Wonderland"
+            ]
+        },
+        {
+            "DSP CBLM": [
+                "Despicable Me"
+            ]
+        },
+        {
+            "QNT MFS LC": [
+                "Quantum of Solace"
+            ]
+        },
+        {
+            "THD RKK NGHT": [
+                "The Dark Knight"
+            ]
+        },
+        {
+            "LLL ND": [
+                "La La Land"
+            ]
+        },
+        {
+            "FND NGD RY": [
+                "Finding Dory"
+            ]
+        },
+        {
+            "MNCH STRB YTHS": [
+                "Manchester by the Sea"
+            ]
+        },
+        {
+            "SWS SRM YMN": [
+                "Swiss Army Man"
+            ]
+        },
+        {
+            "THDV LWRS PRD": [
+                "The Devil Wears Prada"
+            ]
+        },
+        {
+            "CSN RYL": [
+                "Casino Royale"
+            ]
+        },
+        {
+            "LTTL MSSS NSHN": [
+                "Little Miss Sunshine"
+            ]
+        },
+        {
+            "FRGT TNGS RHMR SHLL": [
+                "Forgetting Sarah Marshall"
+            ]
+        },
+        {
+            "THNC RDBL HLK": [
+                "The Incredible Hulk"
+            ]
+        },
+        {
+            "THCR SCSF BNJM NBTTN": [
+                "The Curious Case of Benjamin Button"
+            ]
+        },
+        {
+            "NDNJ NSND THKN GDMF THCR YSTL SKLL": [
+                "Indiana Jones and the Kingdom of the Crystal Skull"
+            ]
+        },
+        {
+            "THGR NDBD PSTH TL": [
+                "The Grand Budapest Hotel"
+            ]
+        },
+        {
+            "MRC NSN PR": [
+                "American Sniper"
+            ]
+        },
+        {
+            "DWNF THPL NTFT HPS": [
+                "Dawn of the Planet of the Apes"
+            ]
+        },
+        {
+            "TNGM TNTN NJTR TLS": [
+                "Teenage Mutant Ninja Turtles"
+            ]
+        },
+        {
+            "MRC NHS TL": [
+                "American Hustle"
+            ]
+        },
+        {
+            "RM": [
+                "Room"
+            ]
+        },
+        {
+            "LSTN TRNS LTN": [
+                "Lost in Translation"
+            ]
+        },
+        {
+            "SHNG HKNG HTS": [
+                "Shanghai Knights"
+            ]
+        }
+    ]
+}

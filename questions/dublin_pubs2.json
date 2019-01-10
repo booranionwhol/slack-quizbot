@@ -1,0 +1,208 @@
+{
+    "title": "*Dublin Pubs* - No Vowels #2",
+    "description": "Pubs, in or near Dublin City Centre",
+    "mode": "QA",
+    "questions": [
+        {
+            "THG RGBR": [
+                "The Garage Bar"
+            ]
+        },
+        {
+            "NS": [
+                "Anseo"
+            ]
+        },
+        {
+            "JKS TTM NS": [
+                "JK Stoutmans"
+            ]
+        },
+        {
+            "DVT TSPB": [
+                "Devitts Pub"
+            ]
+        },
+        {
+            "THPR TRHS CNTRL": [
+                "The Porterhouse Central"
+            ]
+        },
+        {
+            "THL WRD CK": [
+                "The Lower Deck"
+            ]
+        },
+        {
+            "DVY BYR NS": [
+                "Davy Byrnes"
+            ]
+        },
+        {
+            "LYW NBR": [
+                "Ely Wine Bar"
+            ]
+        },
+        {
+            "THR SMN": [
+                "The Oarsman"
+            ]
+        },
+        {
+            "HRL DHS": [
+                "Harold House"
+            ]
+        },
+        {
+            "CFN SN": [
+                "Cafe En Seine"
+            ]
+        },
+        {
+            "THG NGR MN": [
+                "The Ginger Man"
+            ]
+        },
+        {
+            "HRRY SNTH GRN": [
+                "Harrys on The Green"
+            ]
+        },
+        {
+            "KHS": [
+                "Kehoes"
+            ]
+        },
+        {
+            "THB LFRY": [
+                "The Belfry"
+            ]
+        },
+        {
+            "CHP LNS BR": [
+                "Chaplins Bar"
+            ]
+        },
+        {
+            "CTG NBR": [
+                "Octagon Bar"
+            ]
+        },
+        {
+            "LML LGNG RCR": [
+                "L Mulligan Grocer"
+            ]
+        },
+        {
+            "JWS WTMN": [
+                "JW Sweetman"
+            ]
+        },
+        {
+            "RBR TRD": [
+                "Robert Reade"
+            ]
+        },
+        {
+            "SLT TRYS": [
+                "Slatterys"
+            ]
+        },
+        {
+            "MGH RS": [
+                "Meaghers"
+            ]
+        },
+        {
+            "DYLS": [
+                "Doyles"
+            ]
+        },
+        {
+            "MRR YS": [
+                "Murrays"
+            ]
+        },
+        {
+            "THF LWN GTD": [
+                "The Flowing Tide"
+            ]
+        },
+        {
+            "CNW YS": [
+                "Conways"
+            ]
+        },
+        {
+            "RLL YS": [
+                "OReillys"
+            ]
+        },
+        {
+            "THSC KVLL LNG": [
+                "The Sackville Lounge"
+            ]
+        },
+        {
+            "THT RKS HD": [
+                "The Turks Head"
+            ]
+        },
+        {
+            "RYNS": [
+                "Ryans"
+            ]
+        },
+        {
+            "GRG NS": [
+                "Grogans"
+            ]
+        },
+        {
+            "THM ZZ": [
+                "The Mezz"
+            ]
+        },
+        {
+            "RBN BRW NG": [
+                "Urban Brewing"
+            ]
+        },
+        {
+            "BLR NYNN": [
+                "Blarney Inn"
+            ]
+        },
+        {
+            "THBT TNFC TRY": [
+                "The Button Factory"
+            ]
+        },
+        {
+            "FLL NS": [
+                "Fallons"
+            ]
+        },
+        {
+            "THH RBR MSTR": [
+                "The Harbourmaster"
+            ]
+        },
+        {
+            "THG RND SCL": [
+                "The Grand Social"
+            ]
+        },
+        {
+            "THD WSN LNG": [
+                "The Dawson Lounge"
+            ]
+        },
+        {
+            "WHL NS": [
+                "Whelans"
+            ]
+        }
+
+    ]
+}

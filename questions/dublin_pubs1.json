@@ -1,0 +1,209 @@
+{
+    "title": "*Dublin Pubs* - No Vowels",
+    "description": "Pubs, in or near Dublin City Centre",
+    "mode": "QA",
+    "questions": [
+        {
+            "LBR RYBR": [
+                "Library Bar"
+            ]
+        },
+        {
+            "THL NGS TN": [
+                "The Long Stone"
+            ]
+        },
+        {
+            "THG LMM RMN": [
+                "The Glimmerman"
+            ]
+        },
+        {
+            "VCR STRT": [
+                "Vicar Street"
+            ]
+        },
+        {
+            "DRK YKL LYS": [
+                "Darkey Kellys"
+            ]
+        },
+        {
+            "LNG NS": [
+                "Lanigans"
+            ]
+        },
+        {
+            "THB RHS": [
+                "The Beerhouse"
+            ]
+        },
+        {
+            "DLW LD": [
+                "Idlewild"
+            ]
+        },
+        {
+            "THF GGY DW": [
+                "The Foggy Dew"
+            ]
+        },
+        {
+            "THB HMN HS": [
+                "The Bohemian House"
+            ]
+        },
+        {
+            "SNN TTS BR": [
+                "Sinnotts Bar"
+            ]
+        },
+        {
+            "HRC NS": [
+                "Houricans"
+            ]
+        },
+        {
+            "THT HMS HS": [
+                "The Thomas House"
+            ]
+        },
+        {
+            "THB LCK MRKT": [
+                "The Black Market"
+            ]
+        },
+        {
+            "THS WNBR": [
+                "The Swan Bar"
+            ]
+        },
+        {
+            "THH RSS HBR": [
+                "The Horseshoe Bar"
+            ]
+        },
+        {
+            "THP VLN": [
+                "The Pavilion"
+            ]
+        },
+        {
+            "MCG RTHS": [
+                "McGraths"
+            ]
+        },
+        {
+            "THM RCN TLBR": [
+                "The Mercantile Bar"
+            ]
+        },
+        {
+            "THNT RNTN LBR": [
+                "The International Bar"
+            ]
+        },
+        {
+            "THB RZN HD": [
+                "The Brazen Head"
+            ]
+        },
+        {
+            "THW LYFX": [
+                "The Wiley Fox"
+            ]
+        },
+        {
+            "THN RSMN": [
+                "The Norseman"
+            ]
+        },
+        {
+            "RNBR": [
+                "Ruin Bar"
+            ]
+        },
+        {
+            "WLS HSPB": [
+                "Walshs Pub"
+            ]
+        },
+        {
+            "THS NG": [
+                "The Snug"
+            ]
+        },
+        {
+            "PTR SPB": [
+                "Peters Pub"
+            ]
+        },
+        {
+            "THL DST RHS": [
+                "The Old Storehouse"
+            ]
+        },
+        {
+            "MLL GNS": [
+                "Mulligans"
+            ]
+        },
+        {
+            "JCN NLL": [
+                "J OConnell"
+            ]
+        },
+        {
+            "THPR TRHS TMPL BR": [
+                "The Porterhouse Temple Bar"
+            ]
+        },
+        {
+            "THL NCL NSNN": [
+                "The Lincolns Inn"
+            ]
+        },
+        {
+            "THM RKR BR": [
+                "The Marker Bar"
+            ]
+        },
+        {
+            "THL DTR NGL": [
+                "The Auld Triangle"
+            ]
+        },
+        {
+            "CNN LLS BR": [
+                "OConnells Bar"
+            ]
+        },
+        {
+            "THK": [
+                "The Oak"
+            ]
+        },
+        {
+            "THS TGS HD": [
+                "The Stags Head"
+            ]
+        },
+        {
+            "BSKR SNTH BLL": [
+                "Buskers On The Ball"
+            ]
+        },
+        {
+            "MTH RKL LYS": [
+                "Mother Kellys"
+            ]
+        },
+        {
+            "DTW": [
+                "D Two"
+            ]
+        }
+
+
+    ]
+}

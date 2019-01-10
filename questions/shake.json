@@ -1,0 +1,269 @@
+{
+    "title": "Animals of Shakespeare",
+    "description": "Of all 150k lines of Shakespeare, there are some hidden animals. Ignoring punctuation, the answer is split over two words. Eg: The answer *CAT* is hidden in: 'What, Jessica!- Thou shalt not gormandize'",
+    "mode": "QA",
+    "questions": [
+        {
+            "Not Afric owns a serpent I abhor": [
+                "cow"
+            ]
+        },
+        {
+            "The loyal'st husband that did e'er plight troth;": [
+                "deer"
+            ]
+        },
+        {
+            "I am accursed to rob in that thief's company:  the rascal hath removed": [
+                "robin"
+            ]
+        },
+        {
+            "thieves, and go merrily to London, it would be argument for a week,": [
+                "bear"
+            ]
+        },
+        {
+            "A good mouth-filling oath; and leave in sooth,": [
+                "goat"
+            ]
+        },
+        {
+            "vice of lying! This same starv'd justice hath done nothing but": [
+                "fly"
+            ]
+        },
+        {
+            "by, in his nakedness he appears but a man; and though his": [
+                "snake"
+            ]
+        },
+        {
+            "Lean raw-bon'd rascals! Who would e'er suppose": [
+                "deer"
+            ]
+        },
+        {
+            "From famous Edmund Langley, Duke of York,": [
+                "mouse"
+            ]
+        },
+        {
+            "When 'a was naked, he was for all the world like a fork'd radish,": [
+                "snake"
+            ]
+        },
+        {
+            "call'd BOURBON; PRINCE EDWARD, QUEEN MARGARET, and the EARL of OXFORD.": [
+                "fox"
+            ]
+        },
+        {
+            "BASTARD. Saint George, that swing'd the dragon, and e'er since": [
+                "deer"
+            ]
+        },
+        {
+            "Leave them as naked as the vulgar air.": [
+                "snake"
+            ]
+        },
+        {
+            "Goodnight then, Casca: this disturbed sky": [
+                "cat"
+            ]
+        },
+
+        {
+            "I crave no more than hath your highness offer'd,": [
+                "raven"
+            ]
+        },
+
+        {
+            "In, fellow, there, into the hovel; keep thee warm.": [
+                "elk"
+            ]
+        },
+        {
+            "And bring some covering for this naked soul,": [
+                "snake"
+            ]
+        },
+        {
+            "This, Casca; this, Cinna; and this, Metellus Cimber.": [
+                "cat"
+            ]
+        },
+        {
+            "Or, having sworn too hard-a-keeping oath,": [
+                "goat"
+            ]
+        },
+        {
+            "Than for that angel knowledge you can say,": [
+                "elk"
+            ]
+        },
+        {
+            "I crave no other, nor no better man.": [
+                "raven"
+            ]
+        },
+        {
+            "JESSICA. That were a kind of bastard hope indeed; so the sins of my": [
+                "cat"
+            ]
+        },
+        {
+            "your bold-beating oaths, under the shelter of your honour!": [
+                "goat"
+            ]
+        },
+        {
+            "I am not guilty of Lysander's blood;": [
+                "fly"
+            ]
+        },
+        {
+            "This is a brave night to cool a courtezan. I'll speak a prophecy ere I": [
+                "raven"
+            ]
+        },
+        {
+            "A million fail, confounding oath on oath.": [
+                "goat"
+            ]
+        },
+        {
+            "BIANCA. 'Tis very good; I must be circumstanced.            Exeunt.": [
+                "cat"
+            ]
+        },
+        {
+            "To lash the rascals naked through the world": [
+                "snake"
+            ]
+        },
+        {
+            "What may you be? Are you of good or evil?": [
+                "bear"
+            ]
+        },
+        {
+            "LODOVICO. What, not to pray?": [
+                "cow"
+            ]
+        },
+        {
+            "[_Whispers a Lord who goes off in the barge of Lysimachus._]": [
+                "fly"
+            ]
+        },
+        {
+            "The setting sun, and music at the close, ": [
+                "cat"
+            ]
+        },
+        {
+            "My Lord of Oxford-you, Sir William Brandon-": [
+                "fox"
+            ]
+        },
+        {
+            "She vied so fast, protesting oath on oath, ": [
+                "goat"
+            ]
+        },
+        {
+            "I should be arguing still upon that doubt; ": [
+                "bear"
+            ]
+        },
+        {
+            "And let Bianca take her sister's room.": [
+                "cat"
+            ]
+        },
+        {
+            "Face not me. Thou hast braved many men; brave not me: I will neither be": [
+                "raven"
+            ]
+        },
+        {
+            "MALVOLIO. Not black in my mind, though yellow in my legs.": [
+                "lion"
+            ]
+        },
+        {
+            "though thy little finger be armed in a thimble.": [
+                "bear"
+            ]
+        },
+        {
+            "Look not pale, Bianca; thy father will not frown.": [
+                "cat"
+            ]
+        },
+        {
+            "How beauteous mankind is! O brave new world": [
+                "raven"
+            ]
+        },
+
+        {
+            "You may be armed and appointed well.": [
+                "bear"
+            ]
+        },
+        {
+            "is brave now. Who said he came hurt home today? He's not hurt. Why, ": [
+                "raven"
+            ]
+        },
+        {
+            "And rob in the behalf of charity.": [
+                "robin"
+            ]
+        },
+        {
+            "MALVOLIO. Not yet old enough for a man, nor young enough for a boy; ": [
+                "lion"
+            ]
+        },
+
+
+        {
+            "With twenty thousand soul-confirming oaths!": [
+                "goat"
+            ]
+        },
+        {
+            "The little Stars, and all, that looke like aglets:": [
+                "eagle"
+            ]
+        },
+        {
+            "Require of him the hearts of Lyons, and": [
+                "fly"
+            ]
+        },
+
+        {
+            "happier affairs may be are to me unknown; but I have missingly": [
+                "bear"
+            ]
+        },
+        {
+            "His naked armour of still-slaughter'd lust, ": [
+                "snake"
+            ]
+        },
+        {
+            "There pleading might you see grave Nestor stand, ": [
+                "raven"
+            ]
+        }
+
+    ]
+}
