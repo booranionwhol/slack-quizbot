@@ -1,0 +1,115 @@
+United Kingdom,London
+Kenya,Nairobi
+New Zealand,Wellington
+Saudi Arabia,Riyadh
+Philippines,Manila
+North Korea,Pyongyang
+Indonesia,Jakarta
+Czech Republic,Prague
+Suriname,Paramaribo
+Ecuador,Quito
+Belarus,Minsk
+Jamaica,Kingston
+Slovakia,Bratislava
+Morocco,Rabat
+Libya,Tripoli
+Canada,Ottawa
+Spain,Madrid
+Lithuania,Vilnius
+Switzerland,Bern
+Afghanistan,Kabul
+Algeria,Algiers
+Brazil,Brasilia
+Bangladesh,Dhaka
+Portugal,Lisbon
+Oman,Muscat
+Vietnam,Hanoi
+Norway,Oslo
+Romania,Bucharest
+Kosovo,Pristina
+Netherlands,Amsterdam
+Scotland,Edinburgh
+Liechtenstein,Vaduz
+Thailand,Bangkok
+Russia,Moscow
+Germany,Berlin
+Slovenia,Ljubljana
+Bulgaria,Sofia
+Jordan,Amman
+Argentina,Buenos Aires
+Liberia,Monrovia
+Venezuela,Caracas
+Macedonia,Skopje
+Iraq,Baghdad
+France,Paris
+Syria,Damascus
+Serbia,Belgrade
+Iceland,Reykjavik
+Nigeria,Abuja
+Belgium,Brussels
+Turkey,Ankara
+Hungary,Budapest
+Senegal,Dakar
+Montenegro,Podgorica
+Malta,Valletta
+Italy,Rome
+Lesotho,Maseru
+Pakistan,Islamabad
+Latvia,Riga
+Mozambique,Maputo
+Finland,Helsinki
+Sweden,Stockholm
+Colombia,Bogota
+Paraguay,Asuncion
+Estonia,Tallinn
+Niger,Niamey
+Poland,Warsaw
+Austria,Vienna
+Greece,Athens
+South Korea,Seoul
+Monaco,Monaco
+Cuba,Havana
+Namibia,Windhoek
+Malaysia,Kuala Lumpur
+Taiwan,Taipei
+Costa Rica,San Jose
+Denmark,Copenhagen
+Cambodia,Phnom Penh
+Japan,Tokyo
+Ireland,Dublin
+Kazakhstan,Astana
+Qatar,Doha
+Nicaragua,Managua
+Ukraine,Kiev
+Panama,Panama City
+Bolivia,La Paz
+China,Beijing
+South Africa,Pretoria
+Croatia,Zagreb
+Somalia,Mogadishu
+Cyprus,Nicosia
+Australia,Canberra
+Singapore,Singapore
+Nepal,Kathmandu
+United Arab Emirates,Abu Dhabi
+Kyrgyzstan,Bishkek
+Wales,Cardiff
+Sri Lanka,Colombo
+England,London
+Chile,Santiago
+Lebanon,Beirut
+Moldova,Chisinau
+Mongolia,Ulaanbaatar
+Tunisia,Tunis
+Laos,Vientiane
+Zimbabwe,Harare
+Northern Ireland,Belfast
+Rwanda,Kigali
+Peru,Lima
+Iran,Tehran
+Guyana,Georgetown
+Egypt,Cairo
+Georgia,Tbilisi
+Azerbaijan,Baku
+Luxembourg,Luxembourg
+Sierra Leone,Freetown
