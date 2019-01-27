@@ -20,6 +20,7 @@ POINT_DEFAULT_WEIGHT = 1
 GOLDEN_ANSWER_POINTS = 3
 # Slack user Id of user who can issue commands
 QUIZ_MASTER = os.environ['QUIZ_MASTER']
+QUIZ_MASTER_DIRECT_CHAT = os.environ['QUIZ_MASTER_DIRECT_CHAT']
 QUIZ_CHANNEL_ID = os.environ['QUIZ_CHANNEL_ID']  # The Quiz channel
 # For quick debug to go straight to a fake results table.
 CHEAT_TO_RESULTS = False
@@ -227,12 +228,18 @@ def check_if_points_escalated():
 
         if 'Anagrams' in json_data['title']:
             for question, answer in json_data['questions'][CURRENT_QUESTION].items():
-                # There should only be one question object.
-                first_letter=answer[0][0].upper()
+                if question == 'parent':
+                    # The question dict may have another key.
+                    # TODO: Restructure the questions list to have a nested question dict and a clues dict?
+                    continue
+                first_letter = answer[0][0].upper()
             bot_say(f'The first letter for *{question}* is *{first_letter}*')
         else:
             for question, answer in json_data['questions'][CURRENT_QUESTION].items():
-                # There should only be one question object.
+                if question == 'parent':
+                    # The question dict may have another key.
+                    # TODO: Restructure the questions list to have a nested question dict and a clues dict?
+                    continue
                 vowels_clue_list = find_vowels(answer[0])
                 vowels_clue = ' '.join(vowels_clue_list[0:2])
 
@@ -431,6 +438,10 @@ def check_plural(num):
 def ask_question(question_id):
     global answers
     for question, answer in json_data['questions'][question_id].items():
+        if question == 'parent':
+            # The question object may have another key.
+            # TODO: Restructure the questions list to have a nested question dict and a clues dict?
+            continue
         bot_say('Question {i}) *{question}*'.format(
             i=question_id+1, question=check_for_pablo(question)))
         # Set global
@@ -438,7 +449,8 @@ def ask_question(question_id):
         logger('Asking question #{}. Listening for answer: {}'.format(
             question_id, answers))
         # PM QUIZ_MASTER (hardcoded channel for now)
-        bot_say(f'Asked question {question} for answer: {answers}','DDP4JPC9G')
+        bot_say(
+            f'Asked question {question} {get_answer_parent(question_id)} for answer: {answers}', QUIZ_MASTER_DIRECT_CHAT)
 
     if OFFLINE:
         # Normal flow is to set these times based on the confirmation response
@@ -446,6 +458,16 @@ def ask_question(question_id):
         global last_question_time, last_correct_answer
         last_question_time = time.time()
         last_correct_answer = last_question_time
+
+
+def get_answer_parent(question_id):
+    try:
+        question_parent = json_data['questions'][question_id]['parent']
+        for key, value in question_parent.items():
+            # Assume only one item in "parent" key
+            return f'({key}: {value})'
+    except:
+        return ''
 
 
 if sc.rtm_connect(with_team_state=True):
@@ -524,8 +546,14 @@ if sc.rtm_connect(with_team_state=True):
                     bot_say('A Golden answer was found! "{}" :tada: by user <@{}>. {} points!'.format(
                         guess, user, point_weight))
                 else:
-                    bot_say('Answer found! "{}" by <@{}>. {} point{plural}!'.format(
-                        guess, user, point_weight, plural=check_plural(point_weight)))
+                    bot_say('Answer found! "{guess}" {answer_parent} by <@{user}>. {points} point{plural}!'.format(
+                        guess=guess,
+                        user=user,
+                        # TODO: Refactor with Question class:
+                        answer_parent=get_answer_parent(CURRENT_QUESTION),
+                        points=point_weight,
+                        plural=check_plural(point_weight)
+                    ))
 
                 player.inc_score(point_weight)
                 player.answer_time(last_correct_answer-last_question_time)
