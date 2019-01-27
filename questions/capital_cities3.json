@@ -1,197 +1,311 @@
 {
-    "title": "Capital Cities - Anagarms #3",
+    "title": "Capital Cities - Anagrams #3",
     "description": "Anagramised capital cities of mostly well-known countries.",
     "mode": "QA",
     "questions": [
         {
-            "tkoyo": [
+            "ootky": [
                 "Tokyo"
-            ]
+            ],
+            "parent": {
+                "Country": "Japan"
+            }
         },
         {
             "bndilu": [
                 "Dublin"
-            ]
+            ],
+            "parent": {
+                "Country": "Ireland"
+            }
         },
         {
             "nataas": [
                 "Astana"
-            ]
+            ],
+            "parent": {
+                "Country": "Kazakhstan"
+            }
         },
         {
             "oahd": [
                 "Doha"
-            ]
+            ],
+            "parent": {
+                "Country": "Qatar"
+            }
         },
         {
             "nuaaagm": [
                 "Managua"
-            ]
+            ],
+            "parent": {
+                "Country": "Nicaragua"
+            }
         },
         {
             "viek": [
                 "Kiev"
-            ]
+            ],
+            "parent": {
+                "Country": "Ukraine"
+            }
         },
         {
             "p aincmyaat": [
                 "Panama City"
-            ]
+            ],
+            "parent": {
+                "Country": "Panama"
+            }
         },
         {
             "l paza": [
                 "La Paz"
-            ]
+            ],
+            "parent": {
+                "Country": "Bolivia"
+            }
         },
         {
             "bgnieji": [
                 "Beijing"
-            ]
+            ],
+            "parent": {
+                "Country": "China"
+            }
         },
         {
             "reaoirpt": [
                 "Pretoria"
-            ]
+            ],
+            "parent": {
+                "Country": "South Africa"
+            }
         },
         {
             "rgaezb": [
                 "Zagreb"
-            ]
+            ],
+            "parent": {
+                "Country": "Croatia"
+            }
         },
         {
             "uidgmhoas": [
                 "Mogadishu"
-            ]
+            ],
+            "parent": {
+                "Country": "Somalia"
+            }
         },
         {
             "oicasni": [
                 "Nicosia"
-            ]
+            ],
+            "parent": {
+                "Country": "Cyprus"
+            }
         },
         {
             "arcernba": [
                 "Canberra"
-            ]
+            ],
+            "parent": {
+                "Country": "Australia"
+            }
         },
         {
             "oaipsenrg": [
                 "Singapore"
-            ]
+            ],
+            "parent": {
+                "Country": "Singapore"
+            }
         },
         {
             "matnduhka": [
                 "Kathmandu"
-            ]
+            ],
+            "parent": {
+                "Country": "Nepal"
+            }
         },
         {
             "iua bhabd": [
                 "Abu Dhabi"
-            ]
+            ],
+            "parent": {
+                "Country": "United Arab Emirates"
+            }
         },
         {
             "hkbsiek": [
                 "Bishkek"
-            ]
+            ],
+            "parent": {
+                "Country": "Kyrgyzstan"
+            }
         },
         {
             "idarcff": [
                 "Cardiff"
-            ]
+            ],
+            "parent": {
+                "Country": "Wales"
+            }
         },
         {
             "bomoolc": [
                 "Colombo"
-            ]
+            ],
+            "parent": {
+                "Country": "Sri Lanka"
+            }
         },
         {
             "nlonod": [
                 "London"
-            ]
+            ],
+            "parent": {
+                "Country": "England"
+            }
         },
         {
             "tangsaoi": [
                 "Santiago"
-            ]
+            ],
+            "parent": {
+                "Country": "Chile"
+            }
         },
         {
             "buriet": [
                 "Beirut"
-            ]
+            ],
+            "parent": {
+                "Country": "Lebanon"
+            }
         },
         {
             "icuansih": [
                 "Chisinau"
-            ]
+            ],
+            "parent": {
+                "Country": "Moldova"
+            }
         },
         {
             "atnuaabraal": [
                 "Ulaanbaatar"
-            ]
+            ],
+            "parent": {
+                "Country": "Mongolia"
+            }
         },
         {
             "sniut": [
                 "Tunis"
-            ]
+            ],
+            "parent": {
+                "Country": "Tunisia"
+            }
         },
         {
             "eetnivani": [
                 "Vientiane"
-            ]
+            ],
+            "parent": {
+                "Country": "Laos"
+            }
         },
         {
             "arhera": [
                 "Harare"
-            ]
+            ],
+            "parent": {
+                "Country": "Zimbabwe"
+            }
         },
         {
             "sfaetlb": [
                 "Belfast"
-            ]
+            ],
+            "parent": {
+                "Country": "Northern Ireland"
+            }
         },
         {
             "aikgli": [
                 "Kigali"
-            ]
+            ],
+            "parent": {
+                "Country": "Rwanda"
+            }
         },
         {
             "amli": [
                 "Lima"
-            ]
+            ],
+            "parent": {
+                "Country": "Peru"
+            }
         },
         {
             "trhnae": [
                 "Tehran"
-            ]
+            ],
+            "parent": {
+                "Country": "Iran"
+            }
         },
         {
             "roegoewgtn": [
                 "Georgetown"
-            ]
+            ],
+            "parent": {
+                "Country": "Guyana"
+            }
         },
         {
             "aoirc": [
                 "Cairo"
-            ]
+            ],
+            "parent": {
+                "Country": "Egypt"
+            }
         },
         {
             "lsiitib": [
                 "Tbilisi"
-            ]
+            ],
+            "parent": {
+                "Country": "Georgia"
+            }
         },
         {
             "uabk": [
                 "Baku"
-            ]
+            ],
+            "parent": {
+                "Country": "Azerbaijan"
+            }
         },
         {
             "mgouxluber": [
                 "Luxembourg"
-            ]
+            ],
+            "parent": {
+                "Country": "Luxembourg"
+            }
         },
         {
             "enftorwe": [
                 "Freetown"
-            ]
+            ],
+            "parent": {
+                "Country": "Sierra Leone"
+            }
         }
     ]
 }

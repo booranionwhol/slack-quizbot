@@ -1,197 +1,311 @@
 {
-    "title": "Capital Cities - Anagarms #2",
+    "title": "Capital Cities - Anagrams #2",
     "description": "Anagramised capital cities of mostly well-known countries.",
     "mode": "QA",
     "questions": [
         {
             "nomirova": [
                 "Monrovia"
-            ]
+            ],
+            "parent": {
+                "Country": "Liberia"
+            }
         },
         {
             "scacraa": [
                 "Caracas"
-            ]
+            ],
+            "parent": {
+                "Country": "Venezuela"
+            }
         },
         {
             "epojks": [
                 "Skopje"
-            ]
+            ],
+            "parent": {
+                "Country": "Macedonia"
+            }
         },
         {
             "adbgdah": [
                 "Baghdad"
-            ]
+            ],
+            "parent": {
+                "Country": "Iraq"
+            }
         },
         {
             "rpsai": [
                 "Paris"
-            ]
+            ],
+            "parent": {
+                "Country": "France"
+            }
         },
         {
             "ussadcam": [
                 "Damascus"
-            ]
+            ],
+            "parent": {
+                "Country": "Syria"
+            }
         },
         {
             "lreaedbg": [
                 "Belgrade"
-            ]
+            ],
+            "parent": {
+                "Country": "Serbia"
+            }
         },
         {
             "rjviayekk": [
                 "Reykjavik"
-            ]
+            ],
+            "parent": {
+                "Country": "Iceland"
+            }
         },
         {
             "uajab": [
                 "Abuja"
-            ]
+            ],
+            "parent": {
+                "Country": "Nigeria"
+            }
         },
         {
             "srsbelsu": [
                 "Brussels"
-            ]
+            ],
+            "parent": {
+                "Country": "Belgium"
+            }
         },
         {
             "nkaaar": [
                 "Ankara"
-            ]
+            ],
+            "parent": {
+                "Country": "Turkey"
+            }
         },
         {
             "audptbes": [
                 "Budapest"
-            ]
+            ],
+            "parent": {
+                "Country": "Hungary"
+            }
         },
         {
             "kaadr": [
                 "Dakar"
-            ]
+            ],
+            "parent": {
+                "Country": "Senegal"
+            }
         },
         {
             "pdrgiaooc": [
                 "Podgorica"
-            ]
+            ],
+            "parent": {
+                "Country": "Montenegro"
+            }
         },
         {
             "ateatvll": [
                 "Valletta"
-            ]
+            ],
+            "parent": {
+                "Country": "Malta"
+            }
         },
         {
             "mroe": [
                 "Rome"
-            ]
+            ],
+            "parent": {
+                "Country": "Italy"
+            }
         },
         {
             "rseuam": [
                 "Maseru"
-            ]
+            ],
+            "parent": {
+                "Country": "Lesotho"
+            }
         },
         {
             "abalsadim": [
                 "Islamabad"
-            ]
+            ],
+            "parent": {
+                "Country": "Pakistan"
+            }
         },
         {
             "raig": [
                 "Riga"
-            ]
+            ],
+            "parent": {
+                "Country": "Latvia"
+            }
         },
         {
             "moptau": [
                 "Maputo"
-            ]
+            ],
+            "parent": {
+                "Country": "Mozambique"
+            }
         },
         {
             "lienkish": [
                 "Helsinki"
-            ]
+            ],
+            "parent": {
+                "Country": "Finland"
+            }
         },
         {
             "ltkmohosc": [
                 "Stockholm"
-            ]
+            ],
+            "parent": {
+                "Country": "Sweden"
+            }
         },
         {
             "atogbo": [
                 "Bogota"
-            ]
+            ],
+            "parent": {
+                "Country": "Colombia"
+            }
         },
         {
             "iasocnun": [
                 "Asuncion"
-            ]
+            ],
+            "parent": {
+                "Country": "Paraguay"
+            }
         },
         {
             "ilantln": [
                 "Tallinn"
-            ]
+            ],
+            "parent": {
+                "Country": "Estonia"
+            }
         },
         {
             "aniemy": [
                 "Niamey"
-            ]
+            ],
+            "parent": {
+                "Country": "Niger"
+            }
         },
         {
             "rswwaa": [
                 "Warsaw"
-            ]
+            ],
+            "parent": {
+                "Country": "Poland"
+            }
         },
         {
             "innvea": [
                 "Vienna"
-            ]
+            ],
+            "parent": {
+                "Country": "Austria"
+            }
         },
         {
             "eashnt": [
                 "Athens"
-            ]
+            ],
+            "parent": {
+                "Country": "Greece"
+            }
         },
         {
             "oeusl": [
                 "Seoul"
-            ]
+            ],
+            "parent": {
+                "Country": "South Korea"
+            }
         },
         {
             "conmao": [
                 "Monaco"
-            ]
+            ],
+            "parent": {
+                "Country": "Monaco"
+            }
         },
         {
             "havnaa": [
                 "Havana"
-            ]
+            ],
+            "parent": {
+                "Country": "Cuba"
+            }
         },
         {
             "edhkionw": [
                 "Windhoek"
-            ]
+            ],
+            "parent": {
+                "Country": "Namibia"
+            }
         },
         {
             "umark plulua": [
                 "Kuala Lumpur"
-            ]
+            ],
+            "parent": {
+                "Country": "Malaysia"
+            }
         },
         {
             "ipetai": [
                 "Taipei"
-            ]
+            ],
+            "parent": {
+                "Country": "Taiwan"
+            }
         },
         {
             "nsso aej": [
                 "San Jose"
-            ]
+            ],
+            "parent": {
+                "Country": "Costa Rica"
+            }
         },
         {
             "gacennoehp": [
                 "Copenhagen"
-            ]
+            ],
+            "parent": {
+                "Country": "Denmark"
+            }
         },
         {
             "ehnom hpnp": [
                 "Phnom Penh"
-            ]
+            ],
+            "parent": {
+                "Country": "Cambodia"
+            }
         }
     ]
 }
