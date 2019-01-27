@@ -70,7 +70,7 @@ def select_golden_answers():
 
 
 # Load up the questions
-with open(QUESTION_FILE,encoding='utf-8') as file:
+with open(QUESTION_FILE, encoding='utf-8') as file:
     json_data = json.load(file)
     if json_data.get('mode') == 'QA':
         QUIZ_MODE = 'QA'
@@ -87,9 +87,6 @@ with open(QUESTION_FILE,encoding='utf-8') as file:
 
 print(answers)
 print('golden: {}'.format(golden_answers))
-
-
-
 
 
 results_object = {}
@@ -267,11 +264,13 @@ def check_if_points_escalated():
 def logger(msg):
     print(msg)
 
+
 def toggle(var):
     if var == True:
         return False
     if var == False:
         return True
+
 
 def parse_message(read_line_object):
     cleaned = clean_answer(read_line_object[0]['text'])
@@ -295,7 +294,6 @@ def parse_message(read_line_object):
             print(f'Setting ANTIPABLO_LETTERS to {ANTIPABLO_LETTERS}')
         if cleaned.startswith('say'):
             bot_say('<!here> ' + read_line_object[0]['text'][4:])
-
 
     logger("{time_now} - At {time_msg} (event_ts: {event_ts}) User {user} says: '{orig}'. Cleaned: '{cleaned}'".format(
         user=user,
@@ -386,6 +384,7 @@ class Message:
                 last_correct_answer = last_question_time
                 logger('Question asked at {}'.format(self.time_at))
 
+
 UNICODE_SWAPS = {
     "H": ["\u041D"],
     "T": ['\u0422'],
@@ -395,6 +394,7 @@ UNICODE_SWAPS = {
     'M': ['\u041C'],
     'S': ['\u0405']
 }
+
 
 def check_for_pablo(question):
     if ANTIPABLO_SPACE:
