@@ -233,7 +233,8 @@ def check_if_points_escalated():
                     # TODO: Restructure the questions list to have a nested question dict and a clues dict?
                     continue
                 first_letter = answer[0][0].upper()
-            bot_say(f'The first letter for *{question}* is *{first_letter}*')
+                bot_say(
+                    f'The first letter for *{question}* is *{first_letter}*')
         else:
             for question, answer in json_data['questions'][CURRENT_QUESTION].items():
                 if question == 'parent':
@@ -243,10 +244,10 @@ def check_if_points_escalated():
                 vowels_clue_list = find_vowels(answer[0])
                 vowels_clue = ' '.join(vowels_clue_list[0:2])
 
-            bot_say('The first two vowels for *{question}* are: *{vowels}*'.format(
-                question=question,
-                vowels=vowels_clue.upper()
-            ))
+                bot_say('The first two vowels for *{question}* are: *{vowels}*'.format(
+                    question=question,
+                    vowels=vowels_clue.upper()
+                ))
         logger('Clue offered at {}'.format(time.time()))
         CLUES_OFFERED = 1
     if time.time()-last_correct_answer >= float(SECONDS_UNTIL_SECOND_CLUE) and CLUES_OFFERED == 1 and QUIZ_MODE == 'QA':
