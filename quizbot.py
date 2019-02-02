@@ -256,6 +256,10 @@ def check_if_points_escalated():
             SECONDS_UNTIL_SECOND_CLUE, point_weight))
 
         for question, answer in json_data['questions'][CURRENT_QUESTION].items():
+            if question == 'parent':
+                # The question dict may have another key.
+                # TODO: Restructure the questions list to have a nested question dict and a clues dict?
+                continue
             # There should only be one question object.
             answer = answer[0]
 
