@@ -191,7 +191,7 @@ def quiz_results(client, results_object, forced=False):
     logger.info('OUT: %s', result_output)
     fastest_time, fastest_user = Player.order_player_results(
         order_attribute='fastest_answer', reverse=False)[0]
-    bot_say('Fastest anwswer time by <@{fastest_user}>: {fastest_time:.4f}s'.format(
+    bot_say('Fastest answer time by <@{fastest_user}>: {fastest_time:.4f}s'.format(
         fastest_user=fastest_user, fastest_time=fastest_time))
     Player.dump_instances()
     logger.info('Players ordered by points: {}'.format(
@@ -344,12 +344,18 @@ class Player:
         self.score = 0.0
         self.total_guesses = 0
         self.total_correct_answers = 0
+        # TODO: async fetch the user fullname and populate for later use
         Player.instances[user_id] = self
 
     def inc_score(self, points):
 
         self.score += points
         self.total_correct_answers += 1
+        logger.info(
+            f'Answer correct by {self.user_id}. '
+            f'Adding {points} points. Total: {self.score}. '
+            f'Answered: {self.total_correct_answers}'
+        )
 
     def answer_time(self, time):
         self.answer_times.append(round(time, 4))
@@ -493,6 +499,12 @@ def get_answer_parent(question_id):
             return f'({key}: {value})'
     except:
         return ''
+
+#    _________    __  _________   __    ____  ____  ____
+#   / ____/   |  /  |/  / ____/  / /   / __ \/ __ \/ __ \
+#  / / __/ /| | / /|_/ / __/    / /   / / / / / / / /_/ /
+# / /_/ / ___ |/ /  / / /___   / /___/ /_/ / /_/ / ____/
+# \____/_/  |_/_/  /_/_____/  /_____/\____/\____/_/
 
 
 if sc.rtm_connect(with_team_state=True):
