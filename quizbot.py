@@ -23,6 +23,7 @@ PAUSE_BEFORE_FIRST_QUESTION = 3
 SECONDS_NO_GUESSES = 30
 SECONDS_UNTIL_CLUE = 60  # Point decrease, and first clue offered
 SECONDS_UNTIL_SECOND_CLUE = 90  # Point decrease, second, bigger clue offered
+QUESTION_TIMEOUT = 120  # Give up and move to the next question
 # Non-blocking wait between a correct answer and next q
 SECONDS_BETWEEN_ANSWER_AND_QUESTION = 5
 POINT_DEFAULT_WEIGHT = 1
@@ -537,6 +538,25 @@ if sc.rtm_connect(with_team_state=True):
 
         # Set the points available for the next answer
         point_weight = check_if_points_escalated()
+
+        # If we hit the question timeout, give up and move on to the next question
+        if (
+            question_asked
+            and (time.time() - last_question_time >= float(QUESTION_TIMEOUT))
+            and QUIZ_MODE == 'QA'
+        ):
+            logger.info(
+                f'Question timeout ({QUESTION_TIMEOUT}) reached. Giving up waiting.')
+            # Pretend a question was answered to fool the rest of the loop
+            question_answered_correctly = True
+            question_asked = False
+            last_correct_answer = time.time()
+
+            bot_say(
+                f'Too hard or am I broken? '
+                f'The answer was: {answers} {get_answer_parent(CURRENT_QUESTION)}. '
+                f'Moving on to next question...'
+            )
 
         # Check if we've waited SECONDS_BETWEEN_ANSWER_AND_QUESTION before asking next Q
         if (
