@@ -5,6 +5,11 @@ import os
 import json
 import sys
 from statistics import mean
+import logging
+
+FORMAT = '%(asctime)s %(name)s %(levelname)s - %(message)s'
+logging.basicConfig(level=logging.DEBUG, format=FORMAT)
+logger = logging.getLogger(__name__)
 
 #
 # Config
@@ -86,8 +91,8 @@ with open(QUESTION_FILE, encoding='utf-8') as file:
         STARTING_ANSWER_COUNT = len(answers)
         select_golden_answers()
 
-print(answers)
-print('golden: {}'.format(golden_answers))
+logger.info(answers)
+logger.info('golden: {}'.format(golden_answers))
 
 
 results_object = {}
@@ -175,22 +180,25 @@ def quiz_results(client, results_object, forced=False):
             )
         result_output += '\n'
     bot_say('{}'.format(result_output))
-    logger(result_output)
+    logger.info('OUT: %s', result_output)
     fastest_time, fastest_user = Player.order_player_results(
         order_attribute='fastest_answer', reverse=False)[0]
     bot_say('Fastest anwswer time by <@{fastest_user}>: {fastest_time:.4f}s'.format(
         fastest_user=fastest_user, fastest_time=fastest_time))
     Player.dump_instances()
-    logger('Players ordered by points: {}'.format(
+    logger.info('Players ordered by points: {}'.format(
         Player.order_player_results()))
-    logger(result_output)
     sys.exit(0)
 
 
 def bot_say(msg, channel=QUIZ_CHANNEL_ID):
     if OFFLINE:
-        logger('bot_say: {}'.format(msg))
+        logger.info('OUT: bot_say: {}'.format(msg))
         return
+    if channel == QUIZ_CHANNEL_ID:
+        logger.debug(f'OUT: {msg}')
+    else:
+        logger.debug(f'OUT(PM): {msg}')
     sc.rtm_send_message(channel, msg)
 
 
@@ -219,7 +227,8 @@ def check_if_points_escalated():
             point_weight = 2
             bot_say('There have not been any correct guesses in {} seconds. Next correct answer worth {} points!'.format(
                 SECONDS_NO_GUESSES, point_weight))
-            logger('Point escalation offered at {}'.format(time.time()))
+            logger.info(
+                'Point escalation')
             POINT_ESCALATION_OFFERED = True
     if time.time()-last_correct_answer >= float(SECONDS_UNTIL_CLUE) and CLUES_OFFERED == 0 and QUIZ_MODE == 'QA':
         point_weight = 0.5
@@ -248,7 +257,7 @@ def check_if_points_escalated():
                     question=question,
                     vowels=vowels_clue.upper()
                 ))
-        logger('Clue offered at {}'.format(time.time()))
+        logger.info('Clue offered')
         CLUES_OFFERED = 1
     if time.time()-last_correct_answer >= float(SECONDS_UNTIL_SECOND_CLUE) and CLUES_OFFERED == 1 and QUIZ_MODE == 'QA':
         point_weight = 0.1
@@ -267,14 +276,10 @@ def check_if_points_escalated():
             question=question,
             clue=answer[0:round(len(answer)/2)].title()
         ))
-        logger('Second Clue offered at {}'.format(time.time()))
+        logger.info('Second Clue offered')
         CLUES_OFFERED = 2
 
     return point_weight
-
-
-def logger(msg):
-    print(msg)
 
 
 def toggle(var):
@@ -291,23 +296,24 @@ def parse_message(read_line_object):
     channel = read_line_object[0]['channel']
     event_ts = read_line_object[0].get('event_ts', None)
     # Check if direct message
-    #print(f'C: {channel}, u: {user}')
+    # print(f'C: {channel}, u: {user}')
     if (channel[0:2] == 'DC' or channel[0:2] == 'DD') and user == QUIZ_MASTER:
-        logger('Private Message received from QUIZ_MASTER: {}'.format(cleaned))
+        logger.info(
+            'IN: Private Message received from QUIZ_MASTER: {}'.format(cleaned))
         if cleaned == 'remaining':
             bot_say(str(answers), channel)
         if cleaned == 'space':
             global ANTIPABLO_SPACE
             ANTIPABLO_SPACE = toggle(ANTIPABLO_SPACE)
-            print(f'Setting ANTIPABLO_SPACE to {ANTIPABLO_SPACE}')
+            logger.info(f'Setting ANTIPABLO_SPACE to {ANTIPABLO_SPACE}')
         if cleaned == 'letter':
             global ANTIPABLO_LETTERS
             ANTIPABLO_LETTERS = toggle(ANTIPABLO_LETTERS)
-            print(f'Setting ANTIPABLO_LETTERS to {ANTIPABLO_LETTERS}')
+            logger.info(f'Setting ANTIPABLO_LETTERS to {ANTIPABLO_LETTERS}')
         if cleaned.startswith('say'):
             bot_say('<!here> ' + read_line_object[0]['text'][4:])
 
-    logger("{time_now} - At {time_msg} (event_ts: {event_ts}) User {user} says: '{orig}'. Cleaned: '{cleaned}'".format(
+    logger.info("IN: {time_now} - At {time_msg} (event_ts: {event_ts}) User {user} says: '{orig}'. Cleaned: '{cleaned}'".format(
         user=user,
         time_now=time.time(),
         time_msg=time_at,
@@ -353,7 +359,8 @@ class Player:
     @staticmethod
     def dump_instances():
         for user_id, player_instance in Player.instances.items():
-            print('User: {}. Vars: {}'.format(user_id, vars(player_instance)))
+            logger.info('User: {}. Vars: {}'.format(
+                user_id, vars(player_instance)))
 
     @staticmethod
     def order_player_results(order_attribute='score', reverse=True):
@@ -394,7 +401,8 @@ class Message:
                 global last_question_time, last_correct_answer
                 last_question_time = self.time_at
                 last_correct_answer = last_question_time
-                logger('Question asked at {}'.format(self.time_at))
+                logger.info(
+                    'Question asked at slack ts: {}'.format(self.time_at))
 
 
 UNICODE_SWAPS = {
@@ -451,7 +459,7 @@ def ask_question(question_id):
             i=question_id+1, question=check_for_pablo(question)))
         # Set global
         answers = [x.lower() for x in answer]
-        logger('Asking question #{}. Listening for answer: {}'.format(
+        logger.info('Asking question id {}. Listening for answer: {}'.format(
             question_id, answers))
         # PM QUIZ_MASTER (hardcoded channel for now)
         bot_say(
@@ -478,10 +486,10 @@ def get_answer_parent(question_id):
 if sc.rtm_connect(with_team_state=True):
 
     while sc.server.connected is False:
-        print('Waiting for connection..')
+        logger.info('Waiting for connection..')
         time.sleep(1)
     if sc.server.connected is True:
-        print('Connected')
+        logger.info('Connected')
         # Without the sleep, connected seems to be true, but a message can't be sent?
         time.sleep(1)
         if QUIZ_MODE == 'QA':
