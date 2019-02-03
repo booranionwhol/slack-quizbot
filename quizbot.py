@@ -18,6 +18,7 @@ OFFLINE = False  # Allow telnet interface to simulate chat
 # Without this, we might hit a rate-limit on the Slack RTM
 WEBSOCKET_READLOOP_SLEEP = 0.1  # Pauses between reads when no messages waiting
 
+PAUSE_BEFORE_FIRST_QUESTION = 3
 # Point increase when nobody has guessed for X seconds. Should mean the current question is hard
 SECONDS_NO_GUESSES = 30
 SECONDS_UNTIL_CLUE = 60  # Point decrease, and first clue offered
@@ -273,10 +274,10 @@ def check_if_points_escalated():
             # There should only be one question object.
             answer = answer[0]
 
-        bot_say('The *first half* of *{question}* is: *{clue}*'.format(
-            question=question,
-            clue=answer[0:round(len(answer)/2)].title()
-        ))
+            bot_say('The *first half* of *{question}* is: *{clue}*'.format(
+                question=question,
+                clue=answer[0:round(len(answer)/2)].title()
+            ))
         logger.info('Second Clue offered')
         CLUES_OFFERED = 2
 
@@ -329,6 +330,7 @@ class Player:
     instances = {}
 
     def __init__(self, user_id):
+        logger.info(f'New player seen. Adding {user_id}')
         self.user_id = user_id
         self.fastest_answer = 0.0
         self.answer_times = []
@@ -499,7 +501,7 @@ if sc.rtm_connect(with_team_state=True):
                 total=QUESTION_COUNT,
                 description=json_data['description']
             ))
-            time.sleep(12)
+            time.sleep(PAUSE_BEFORE_FIRST_QUESTION)
             last_correct_answer = time.time()
             ask_question(CURRENT_QUESTION)
         else:
