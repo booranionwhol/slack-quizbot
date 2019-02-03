@@ -23,6 +23,8 @@ PAUSE_BEFORE_FIRST_QUESTION = 3
 SECONDS_NO_GUESSES = 30
 SECONDS_UNTIL_CLUE = 60  # Point decrease, and first clue offered
 SECONDS_UNTIL_SECOND_CLUE = 90  # Point decrease, second, bigger clue offered
+# Non-blocking wait between a correct answer and next q
+SECONDS_BETWEEN_ANSWER_AND_QUESTION = 5
 POINT_DEFAULT_WEIGHT = 1
 GOLDEN_ANSWER_POINTS = 3
 # Slack user Id of user who can issue commands
@@ -55,6 +57,9 @@ QUESTION_COUNT = 0
 REMAINING_QUESTIONS = 0
 POINT_ESCALATION_OFFERED = False
 CLUES_OFFERED = 0
+
+question_answered_correctly = False
+question_asked = False
 
 answers = []
 answers_found = []
@@ -401,9 +406,10 @@ class Message:
                 # Point escalation logic is based from last_correct_answer time.
                 # Allow this to work with new Q+A format also, by re-setting it to
                 # the time the question was offered.
-                global last_question_time, last_correct_answer
+                global last_question_time, last_correct_answer, question_asked
                 last_question_time = self.time_at
                 last_correct_answer = last_question_time
+                question_asked = True
                 logger.info(
                     'Question asked at slack ts: {}'.format(self.time_at))
 
@@ -452,7 +458,9 @@ def check_plural(num):
 
 
 def ask_question(question_id):
-    global answers
+    global answers, question_asked, question_answered_correctly
+    question_answered_correctly = False
+
     for question, answer in json_data['questions'][question_id].items():
         if question == 'parent':
             # The question object may have another key.
@@ -530,6 +538,21 @@ if sc.rtm_connect(with_team_state=True):
         # Set the points available for the next answer
         point_weight = check_if_points_escalated()
 
+        # Check if we've waited SECONDS_BETWEEN_ANSWER_AND_QUESTION before asking next Q
+        if (
+            QUIZ_MODE == 'QA'
+            and question_answered_correctly
+            and not question_asked
+            and (last_correct_answer + float(SECONDS_BETWEEN_ANSWER_AND_QUESTION)) <= time.time()
+        ):
+            logger.debug('Wait time after correct answer has been reached')
+            CURRENT_QUESTION = CURRENT_QUESTION+1
+            REMAINING_QUESTIONS = REMAINING_QUESTIONS-1
+            if REMAINING_QUESTIONS != 0:
+                # TODO: This sleep blocks processing of messages between the
+                # time.sleep(5)
+                ask_question(CURRENT_QUESTION)
+
         msg_counter = 0
         for read_msg in sc.rtm_read():
             msg_counter += 1
@@ -554,6 +577,10 @@ if sc.rtm_connect(with_team_state=True):
             # Right answer
             if guess in answers:
                 last_correct_answer = float(time_at)
+                question_answered_correctly = True
+                question_asked = False
+                logger.info(
+                    f'Answer found. Waiting for {SECONDS_BETWEEN_ANSWER_AND_QUESTION} seconds before asking next')
 
                 if guess in golden_answers:
                     bot_reaction(msg_timestamp=time_at, emoji='tada')
@@ -587,12 +614,6 @@ if sc.rtm_connect(with_team_state=True):
                 CLUES_OFFERED = 0
                 point_weight = POINT_DEFAULT_WEIGHT
 
-                if QUIZ_MODE == 'QA':
-                    CURRENT_QUESTION = CURRENT_QUESTION+1
-                    REMAINING_QUESTIONS = REMAINING_QUESTIONS-1
-                    if REMAINING_QUESTIONS != 0:
-                        time.sleep(5)
-                        ask_question(CURRENT_QUESTION)
         # rtm_read() says it makes a list of multiple events, but only ever seems to have 1?
         # If it *was* 0, then pause before next read.
         if msg_counter == 0:
