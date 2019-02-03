@@ -7,7 +7,7 @@ import sys
 from statistics import mean
 import logging
 
-FORMAT = '%(asctime)s %(name)s %(levelname)s - %(message)s'
+FORMAT = '%(asctime)s %(name)s %(levelname)5s - %(message)s'
 logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 logger = logging.getLogger(__name__)
 
@@ -16,8 +16,9 @@ logger = logging.getLogger(__name__)
 #
 OFFLINE = False  # Allow telnet interface to simulate chat
 # Without this, we might hit a rate-limit on the Slack RTM
-WEBSOCKET_READLOOP_SLEEP = 0.1
-# Point increase when nobody has guessed for X mins. Should mean the current question is hard
+WEBSOCKET_READLOOP_SLEEP = 0.1  # Pauses between reads when no messages waiting
+
+# Point increase when nobody has guessed for X seconds. Should mean the current question is hard
 SECONDS_NO_GUESSES = 30
 SECONDS_UNTIL_CLUE = 60  # Point decrease, and first clue offered
 SECONDS_UNTIL_SECOND_CLUE = 90  # Point decrease, second, bigger clue offered
@@ -516,8 +517,6 @@ if sc.rtm_connect(with_team_state=True):
     # Main game loop
 
     while sc.server.connected is True:
-        time.sleep(WEBSOCKET_READLOOP_SLEEP)
-
         # End the quiz if no answers left
         if QUIZ_MODE == 'QA':
             if REMAINING_QUESTIONS == 0:
@@ -529,10 +528,11 @@ if sc.rtm_connect(with_team_state=True):
         # Set the points available for the next answer
         point_weight = check_if_points_escalated()
 
+        msg_counter = 0
         for read_msg in sc.rtm_read():
+            msg_counter += 1
             message = Message(read_msg)
             if not message.is_guess:
-                time.sleep(WEBSOCKET_READLOOP_SLEEP)
                 continue  # Read next message
 
             # Quick hack to avoid more work after Message became a class. Awaiting refactor
@@ -591,6 +591,13 @@ if sc.rtm_connect(with_team_state=True):
                     if REMAINING_QUESTIONS != 0:
                         time.sleep(5)
                         ask_question(CURRENT_QUESTION)
+        # rtm_read() says it makes a list of multiple events, but only ever seems to have 1?
+        # If it *was* 0, then pause before next read.
+        if msg_counter == 0:
+            # logger.debug('Found %d messages in websocket', msg_counter)
+            # logger.debug('Ending websocket read loop. Sleeping %f',
+            #              WEBSOCKET_READLOOP_SLEEP)
+            time.sleep(WEBSOCKET_READLOOP_SLEEP)
 
 else:
     print("Connection Failed")
