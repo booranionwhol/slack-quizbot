@@ -62,6 +62,11 @@ CLUES_OFFERED = 0
 question_answered_correctly = False
 question_asked = False
 
+# Use a global for now until more refactoring. Later will be passed properly
+# This will be set as a new 'Question' instance when ask_question() is invoked
+# point escalation, game loop etc will use the global.
+cur_question = ''
+
 answers = []
 answers_found = []
 STARTING_ANSWER_COUNT = 0
@@ -224,6 +229,49 @@ def find_vowels(line):
     return clue_list
 
 
+class Question():
+    # json_data should be read in future from a Quiz class?
+    def __init__(self, q_id):
+        logger.info(f'New question loaded. question_id: {q_id}')
+
+        for key, value in json_data['questions'][q_id].items():
+            if key != "parent":
+                self.question = key
+                self.answers = [x.lower() for x in value]
+
+        try:
+            question_parent = json_data['questions'][q_id]['parent']
+            for key, value in question_parent.items():
+                # Assume only one item in "parent" key
+                self.parent_key = key
+                self.parent_value = value
+                self.has_parent = True
+        except:
+            self.has_parent = False
+
+        # The type should really be an attribute forced in the quiz json. Or per Q
+        if 'Anagram' in json_data['title']:
+            # First letter of first answer
+            self.first_clue = self.answers[0][0].upper()
+            self.first_clue_text = f'The first letter for *{self.question}* is *{self.first_clue}*'
+
+        else:  # Only NO VOWELS for now
+            vowels_clue_list = find_vowels(self.answers[0])
+            vowels_clue = ' '.join(vowels_clue_list[0:2]).upper()
+            self.first_clue_text = f'The first two vowels for *{self.question}* are: *{vowels_clue}*'
+
+        # First half of the first answer
+        answer = self.answers[0]
+        self.second_clue = answer[0:round(len(answer) / 2)].title()
+        self.second_clue_text = f'The *first half* of *{self.question}* is: *{self.second_clue}*'
+
+    def get_answer_parent(self):
+        if self.has_parent:
+            return f'({self.parent_key}: {self.parent_value})'
+        else:
+            return ''
+
+
 def check_if_points_escalated():
     # We need to set this to check in a later read loop. Make global
     global POINT_ESCALATION_OFFERED, point_weight, CLUES_OFFERED
@@ -235,36 +283,14 @@ def check_if_points_escalated():
             point_weight = 2
             bot_say('There have not been any correct guesses in {} seconds. Next correct answer worth {} points!'.format(
                 SECONDS_NO_GUESSES, point_weight))
-            logger.info(
-                'Point escalation')
+            logger.info('Point escalation')
             POINT_ESCALATION_OFFERED = True
     if time.time()-last_correct_answer >= float(SECONDS_UNTIL_CLUE) and CLUES_OFFERED == 0 and QUIZ_MODE == 'QA':
         point_weight = 0.5
         bot_say('There have not been any correct guesses in {} seconds. Next answer now worth {} points with a clue:'.format(
             SECONDS_UNTIL_CLUE, point_weight))
 
-        if 'Anagrams' in json_data['title']:
-            for question, answer in json_data['questions'][CURRENT_QUESTION].items():
-                if question == 'parent':
-                    # The question dict may have another key.
-                    # TODO: Restructure the questions list to have a nested question dict and a clues dict?
-                    continue
-                first_letter = answer[0][0].upper()
-                bot_say(
-                    f'The first letter for *{question}* is *{first_letter}*')
-        else:
-            for question, answer in json_data['questions'][CURRENT_QUESTION].items():
-                if question == 'parent':
-                    # The question dict may have another key.
-                    # TODO: Restructure the questions list to have a nested question dict and a clues dict?
-                    continue
-                vowels_clue_list = find_vowels(answer[0])
-                vowels_clue = ' '.join(vowels_clue_list[0:2])
-
-                bot_say('The first two vowels for *{question}* are: *{vowels}*'.format(
-                    question=question,
-                    vowels=vowels_clue.upper()
-                ))
+        bot_say(cur_question.first_clue_text)
         logger.info('Clue offered')
         CLUES_OFFERED = 1
     if time.time()-last_correct_answer >= float(SECONDS_UNTIL_SECOND_CLUE) and CLUES_OFFERED == 1 and QUIZ_MODE == 'QA':
@@ -272,18 +298,7 @@ def check_if_points_escalated():
         bot_say('You are all terrible. No correct guesses in {} seconds. Next answer now worth {} points with a big clue:'.format(
             SECONDS_UNTIL_SECOND_CLUE, point_weight))
 
-        for question, answer in json_data['questions'][CURRENT_QUESTION].items():
-            if question == 'parent':
-                # The question dict may have another key.
-                # TODO: Restructure the questions list to have a nested question dict and a clues dict?
-                continue
-            # There should only be one question object.
-            answer = answer[0]
-
-            bot_say('The *first half* of *{question}* is: *{clue}*'.format(
-                question=question,
-                clue=answer[0:round(len(answer)/2)].title()
-            ))
+        bot_say(cur_question.second_clue_text)
         logger.info('Second Clue offered')
         CLUES_OFFERED = 2
 
@@ -465,23 +480,22 @@ def check_plural(num):
 
 
 def ask_question(question_id):
-    global answers, question_asked, question_answered_correctly
+    global answers, question_asked, question_answered_correctly, cur_question
     question_answered_correctly = False
 
-    for question, answer in json_data['questions'][question_id].items():
-        if question == 'parent':
-            # The question object may have another key.
-            # TODO: Restructure the questions list to have a nested question dict and a clues dict?
-            continue
-        bot_say('Question {i}) *{question}*'.format(
-            i=question_id+1, question=check_for_pablo(question)))
-        # Set global
-        answers = [x.lower() for x in answer]
-        logger.info('Asking question id {}. Listening for answer: {}'.format(
-            question_id, answers))
-        # PM QUIZ_MASTER (hardcoded channel for now)
-        bot_say(
-            f'Asked question {question} {get_answer_parent(question_id)} for answer: {answers}', QUIZ_MASTER_DIRECT_CHAT)
+    # Instantiate question object, set global. Pass properly with later refactor
+    cur_question = Question(question_id)
+    q = cur_question
+
+    bot_say('Question {i}) *{question}*'.format(
+        i=question_id+1, question=check_for_pablo(q.question)))
+    # Set global
+    answers = q.answers
+    logger.info('Asking question id {}. Listening for answer: {}'.format(
+        question_id, q.answers))
+    # PM QUIZ_MASTER (hardcoded channel for now)
+    bot_say(
+        f'Asked question {q.question} {q.get_answer_parent()} for answer: {q.answers}', QUIZ_MASTER_DIRECT_CHAT)
 
     if OFFLINE:
         # Normal flow is to set these times based on the confirmation response
@@ -524,6 +538,7 @@ if sc.rtm_connect(with_team_state=True):
             ))
             time.sleep(PAUSE_BEFORE_FIRST_QUESTION)
             last_correct_answer = time.time()
+            # Makes new question instance in global cur_question
             ask_question(CURRENT_QUESTION)
         else:
             bot_say('<!here> Quiz starting. *{title}* - {description}.\n\nThere are *{total}* total answers. *{goldens} golden answers* :tada: worth *{golden_points}* points :moneybag: each. Chosen at random.'.format(
@@ -566,7 +581,7 @@ if sc.rtm_connect(with_team_state=True):
 
             bot_say(
                 f'Too hard or am I broken? '
-                f'The answer was: {answers} {get_answer_parent(CURRENT_QUESTION)}. '
+                f'The answer was: {cur_question.answers} {cur_question.get_answer_parent()}. '
                 f'Moving on to next question...'
             )
 
@@ -581,8 +596,6 @@ if sc.rtm_connect(with_team_state=True):
             CURRENT_QUESTION = CURRENT_QUESTION+1
             REMAINING_QUESTIONS = REMAINING_QUESTIONS-1
             if REMAINING_QUESTIONS != 0:
-                # TODO: This sleep blocks processing of messages between the
-                # time.sleep(5)
                 ask_question(CURRENT_QUESTION)
 
         msg_counter = 0
@@ -624,7 +637,7 @@ if sc.rtm_connect(with_team_state=True):
                         guess=guess,
                         user=user,
                         # TODO: Refactor with Question class:
-                        answer_parent=get_answer_parent(CURRENT_QUESTION),
+                        answer_parent=cur_question.get_answer_parent(),
                         points=point_weight,
                         plural=check_plural(point_weight)
                     ))
