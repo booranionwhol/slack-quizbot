@@ -32,6 +32,7 @@ GOLDEN_ANSWER_POINTS = 3
 COMBO_BREAKER_BONUS_POINTS = 2
 # Slack user Id of user who can issue commands
 QUIZ_MASTER = os.environ['QUIZ_MASTER']
+SKIP_QUIZ_MASTER_IN_RESULTS = False  # Set to False for easier testing
 QUIZ_MASTER_DIRECT_CHAT = os.environ['QUIZ_MASTER_DIRECT_CHAT']
 QUIZ_CHANNEL_ID = os.environ['QUIZ_CHANNEL_ID']  # The Quiz channel
 # For quick debug to go straight to a fake results table.
@@ -441,9 +442,13 @@ class Player:
 
     @staticmethod
     def order_player_results(order_attribute='score', reverse=True):
+        # TODO: Make better secondary ordering if two players have the same score
+        # Perhaps by accuracy or most correct answers?
         results_table = []
         for user_id, player_instance in Player.instances.items():
-            if user_id != QUIZ_MASTER:
+            if user_id == QUIZ_MASTER and SKIP_QUIZ_MASTER_IN_RESULTS:
+                pass
+            else:
                 if order_attribute == 'fastest_answer' and player_instance.fastest_answer == 0.0:
                     pass
                 else:
