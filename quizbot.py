@@ -167,6 +167,13 @@ def podium_medal(position, total_player_results):
         return ''
 
 
+def check_for_bonus(points):
+    if points > 0.0:
+        return f' (Bonus: {points})'
+    else:
+        return ''
+
+
 def quiz_results(client, results_object, forced=False):
     if forced:
         bot_say('Ok fine. You lot are useless! The results are...')
@@ -178,11 +185,12 @@ def quiz_results(client, results_object, forced=False):
         score = result[0]
         user_id = result[1]
         player = Player.load_player(user_id)
-        result_output += "{pos} {medal}) <@{user}>, score: {score:.1f}.".format(
+        result_output += "{pos} {medal}) <@{user}>, score: {score:.1f}{bonus}.".format(
             pos=ordinal(index+1),
             medal=podium_medal(index+1, Player.order_player_results()),
             user=user_id,
-            score=score
+            score=score,
+            bonus=check_for_bonus(player.bonus_score),
         )
         if player.score > 0.0:
             result_output += " Correct answers: {answers} ({guess_percent:02.0f}% accuracy). Average time: {avg:.4f}s. Highest streak: {streak}".format(
