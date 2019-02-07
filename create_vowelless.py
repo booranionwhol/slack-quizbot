@@ -2,19 +2,21 @@ import json
 
 qa_dict = []
 vowels = ['a', 'e', 'i', 'o', 'u', ' ', '.', '\'']
-with open('oscar_vowels.txt') as file:
-    for line in file:
-        answer = line.rstrip()
-        line = answer.lower()
+with open('tourist_destinations_seed.txt') as file:
+    lines = file.read().splitlines()
+
+    for line in lines:
+        answer, parent = line.split('|')
+        answer = answer.lower()
         for vowel in vowels:
-            line = line.replace(vowel, '')
-        if len(line) > 10:
+            answer = answer.replace(vowel, '')
+        if len(answer) > 10:
             split_size = 4
-        if len(line) <= 10:
+        if len(answer) <= 10:
             split_size = 3
         result = []
-        for i in range(0, len(line), split_size):
-            result.append(line[i:i+split_size])
+        for i in range(0, len(answer), split_size):
+            result.append(answer[i:i+split_size])
         # A letter on its own looks weird. Merge it to the previous block if found
         # TODO:
         # If the first word is 'The'. Merge the 'Th' to the right a bit randomly?
@@ -25,6 +27,6 @@ with open('oscar_vowels.txt') as file:
         cryptic = ' '.join(result).upper()
         # print(cryptic)
         #print('{"{}}": ["{}}"]},'.format(cryptic,answer))
-        question_dict = {cryptic: [answer]}
+        question_dict = {cryptic: [answer], 'parent': {'Location': parent}}
         qa_dict.append(question_dict)
 print(json.dumps(qa_dict))
