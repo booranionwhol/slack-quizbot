@@ -29,7 +29,12 @@ SECONDS_BETWEEN_ANSWER_AND_QUESTION = 5
 POINT_DEFAULT_WEIGHT = 1
 STREAK_BONUS_THRESHOLD = 3
 GOLDEN_ANSWER_POINTS = 3
-COMBO_BREAKER_BONUS_POINTS = 2
+# Matrix of points awarded for breaking a streak
+# key: value = streak_broken_size: points_awarded
+COMBO_BREAKER_BONUS_POINTS = {1: 0, 2: 0, 3: 1, 4: 1, 5: 2, 6: 2, 7: 3, 8: 4}
+COMBO_BREAKER_BONUS_POINTS_DEFAULT = 5  # Awarded if beyond the above matrix
+# HIGHEST_STREAK_BONUS_POINTS = x # For now use the COMBO_BREAKER_MATRIX? See what happens
+
 # Slack user Id of user who can issue commands
 QUIZ_MASTER = os.environ['QUIZ_MASTER']
 SKIP_QUIZ_MASTER_IN_RESULTS = False  # Set to False for easier testing
@@ -69,6 +74,8 @@ question_asked = False
 # This will be set as a new 'Question' instance when ask_question() is invoked
 # point escalation, game loop etc will use the global.
 cur_question = ''
+
+results_object = {}
 
 answers = []
 answers_found = []
@@ -111,7 +118,6 @@ logger.info(answers)
 logger.info('golden: {}'.format(golden_answers))
 
 
-results_object = {}
 if CHEAT_TO_RESULTS:
     answers = []
     results_object = {
@@ -194,7 +200,7 @@ def quiz_results(client, results_object, forced=False):
             bonus=check_for_bonus(player.bonus_score),
         )
         if player.score > 0.0:
-            result_output += " Correct answers: {answers} ({guess_percent:02.0f}% accuracy). Average time: {avg:.4f}s. Highest streak: {streak}".format(
+            result_output += " Correct answers: {answers} ({guess_percent:02.0f}% accuracy). Average time: {avg:.4f}s. Streak: {streak}".format(
                 answers=player.total_correct_answers,
                 guess_percent=(
                     player.total_correct_answers /
@@ -359,6 +365,14 @@ def parse_message(read_line_object):
     return (user, time_at, cleaned)
 
 
+def get_combo_breaker_points(streak_broken):
+    points = COMBO_BREAKER_BONUS_POINTS.get(streak_broken)
+    if points:
+        return points
+    else:
+        return COMBO_BREAKER_BONUS_POINTS_DEFAULT
+
+
 class Player:
     instances = {}
     has_streak = ''
@@ -390,26 +404,29 @@ class Player:
         )
 
     def inc_streak(self):
-        if Player.last_correct and Player.last_correct != self:  # self must be breaking someone else's combo
-            prev = Player.last_correct
+        # self is breaking someone else's combo
+        if Player.last_correct and Player.last_correct != self.user_id:
+            prev = Player.load_player(Player.last_correct)
             logger.debug(
                 f'Current streak of {prev.score_streak} - {prev.user_id} '
                 f'broken by {self.user_id}')
 
             # This probably shouldn't be in the Player class. Not sure where to put it
+            # Only trigger a breaker if the streak was bigger than threshold
             if prev.score_streak >= STREAK_BONUS_THRESHOLD:
                 logger.debug(f'Combo breaker!')
+                bonus_points = get_combo_breaker_points(prev.score_streak)
                 bot_say(
                     f":zap: C-C-C-COMBO BREAKER! :zap: <@{prev.user_id}>'s streak :cut_of_meat: "
                     f"of {prev.score_streak} has been broken! :sob: "
-                    f"{COMBO_BREAKER_BONUS_POINTS} bonus points to <@{self.user_id}> :tada:"
+                    f"{bonus_points} bonus point{check_plural(bonus_points)} to <@{self.user_id}> :tada:"
                 )
-                self.score += COMBO_BREAKER_BONUS_POINTS
-                self.bonus_score += COMBO_BREAKER_BONUS_POINTS
+                self.score += bonus_points
+                self.bonus_score += bonus_points
 
             prev.score_streak = 0  # Reset the previous player's streak now that it's broken
 
-        Player.last_correct = self  # Set last correct as current Player instance
+        Player.last_correct = self.user_id  # Set last correct as current Player instance
 
         # Increase the Player's streak count
         self.score_streak += 1
