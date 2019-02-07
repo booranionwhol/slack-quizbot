@@ -27,7 +27,9 @@ QUESTION_TIMEOUT = 120  # Give up and move to the next question
 # Non-blocking wait between a correct answer and next q
 SECONDS_BETWEEN_ANSWER_AND_QUESTION = 5
 POINT_DEFAULT_WEIGHT = 1
+STREAK_BONUS_THRESHOLD = 3
 GOLDEN_ANSWER_POINTS = 3
+COMBO_BREAKER_BONUS_POINTS = 2
 # Slack user Id of user who can issue commands
 QUIZ_MASTER = os.environ['QUIZ_MASTER']
 QUIZ_MASTER_DIRECT_CHAT = os.environ['QUIZ_MASTER_DIRECT_CHAT']
@@ -183,13 +185,14 @@ def quiz_results(client, results_object, forced=False):
             score=score
         )
         if player.score > 0.0:
-            result_output += " Correct answers: {answers} ({guess_percent:02.0f}% accuracy). Average time: {avg:.4f}s".format(
+            result_output += " Correct answers: {answers} ({guess_percent:02.0f}% accuracy). Average time: {avg:.4f}s. Highest streak: {streak}".format(
                 answers=player.total_correct_answers,
                 guess_percent=(
                     player.total_correct_answers /
                     player.total_guesses *
                     100),
-                avg=player.average_answer_time
+                avg=player.average_answer_time,
+                streak=player.highest_score_streak,
             )
         result_output += '\n'
     bot_say('{}'.format(result_output))
@@ -349,6 +352,8 @@ def parse_message(read_line_object):
 
 class Player:
     instances = {}
+    has_streak = ''
+    last_correct = ''
 
     def __init__(self, user_id):
         logger.info(f'New player seen. Adding {user_id}')
@@ -359,11 +364,14 @@ class Player:
         self.score = 0.0
         self.total_guesses = 0
         self.total_correct_answers = 0
+        self.highest_score_streak = 0
+        self.score_streak = 0
+        self.bonus_score = 0.0
         # TODO: async fetch the user fullname and populate for later use
         Player.instances[user_id] = self
 
     def inc_score(self, points):
-
+        self.inc_streak()
         self.score += points
         self.total_correct_answers += 1
         logger.info(
@@ -371,6 +379,37 @@ class Player:
             f'Adding {points} points. Total: {self.score}. '
             f'Answered: {self.total_correct_answers}'
         )
+
+    def inc_streak(self):
+        if Player.last_correct and Player.last_correct != self:  # self must be breaking someone else's combo
+            prev = Player.last_correct
+            logger.debug(
+                f'Current streak of {prev.score_streak} - {prev.user_id} '
+                f'broken by {self.user_id}')
+
+            # This probably shouldn't be in the Player class. Not sure where to put it
+            if prev.score_streak >= STREAK_BONUS_THRESHOLD:
+                logger.debug(f'Combo breaker!')
+                bot_say(
+                    f":zap: C-C-C-COMBO BREAKER! :zap: <@{prev.user_id}>'s streak :cut_of_meat: "
+                    f"of {prev.score_streak} has been broken! :sob: "
+                    f"{COMBO_BREAKER_BONUS_POINTS} bonus points to <@{self.user_id}> :tada:"
+                )
+                self.score += COMBO_BREAKER_BONUS_POINTS
+                self.bonus_score += COMBO_BREAKER_BONUS_POINTS
+
+            prev.score_streak = 0  # Reset the previous player's streak now that it's broken
+
+        Player.last_correct = self  # Set last correct as current Player instance
+
+        # Increase the Player's streak count
+        self.score_streak += 1
+        if self.score_streak > self.highest_score_streak:
+            self.highest_score_streak = self.score_streak
+
+        if self.score_streak >= STREAK_BONUS_THRESHOLD:
+            bot_say(
+                f'<@{self.user_id}> just hit a streak of {self.score_streak} correct answers :fire:')
 
     def answer_time(self, time):
         self.answer_times.append(round(time, 4))
