@@ -182,12 +182,20 @@ def check_for_bonus(points):
 
 
 def quiz_results(client, results_object, forced=False):
+    Player.dump_instances()
+
     if forced:
         bot_say('Ok fine. You lot are useless! The results are...')
     else:
         bot_say('Quiz over! The results are...')
 
     result_output = ""
+
+    # highest_streakers_results = Player.find_high_streak_players()
+    # if highest_streakers_results:
+    #     # TODO: add_high_streak_bonus_to_streakers()
+    #     pass
+
     for index, result in enumerate(Player.order_player_results()):
         score = result[0]
         user_id = result[1]
@@ -216,7 +224,6 @@ def quiz_results(client, results_object, forced=False):
         order_attribute='fastest_answer', reverse=False)[0]
     bot_say('Fastest answer time by <@{fastest_user}>: {fastest_time:.4f}s'.format(
         fastest_user=fastest_user, fastest_time=fastest_time))
-    Player.dump_instances()
     logger.info('Players ordered by points: {}'.format(
         Player.order_player_results()))
     sys.exit(0)
@@ -377,6 +384,7 @@ class Player:
     instances = {}
     has_streak = ''
     last_correct = ''
+    highest_streakers_streak = 0
 
     def __init__(self, user_id):
         logger.info(f'New player seen. Adding {user_id}')
@@ -474,6 +482,42 @@ class Player:
                     )
         results_table.sort(reverse=reverse)
         return results_table
+
+    @staticmethod
+    def find_high_streak_players():
+        all_streaks = []
+        for user_id, player_instance in Player.instances.items():
+            if user_id == QUIZ_MASTER and SKIP_QUIZ_MASTER_IN_RESULTS:
+                pass
+            else:
+                if player_instance.highest_score_streak >= STREAK_BONUS_THRESHOLD:
+                    all_streaks.append(
+                        (player_instance.highest_score_streak, player_instance.user_id))
+        if not all_streaks:
+            return None  # Nobody got a streak over the threshold
+
+        all_streaks.sort(reverse=True)
+        highest_streakers = []
+        if len(all_streaks) == 1:
+            # Set to single user_id
+            highest_streakers = [all_streaks[0][1]]
+            Player.highest_streakers_streak = all_streaks[0][0]
+            return highest_streakers
+
+        first_item = all_streaks.pop(0)
+        highest_streakers.append(first_item[1])
+        next_item_lower = False
+        while not next_item_lower:
+            next_item = all_streaks.pop(0)
+            # Compare streak count to see if its a tie
+            if next_item[0] == first_item[0]:
+                highest_streakers.append(next_item[1])
+            else:
+                next_item_lower = True
+
+        # Get the streak num from the highest
+        Player.highest_streakers_streak = all_streaks[0][0]
+        return highest_streakers
 
 
 class Message:
