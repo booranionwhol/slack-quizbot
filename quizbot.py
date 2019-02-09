@@ -201,6 +201,8 @@ def quiz_results(client, results_object, forced=False):
         score = result[0]
         user_id = result[1]
         player = Player.load_player(user_id)
+
+        # Include anyone who made a guess in the results table.
         result_output += "{pos} {medal}) <@{user}>, score: {score:.1f}{bonus}.".format(
             pos=ordinal(index+1),
             medal=podium_medal(index+1, Player.order_player_results()),
@@ -208,17 +210,22 @@ def quiz_results(client, results_object, forced=False):
             score=score,
             bonus=check_for_bonus(player.bonus_score),
         )
+        # But only include other stats if they actually got something right
         if player.score > 0.0:
-            result_output += " Correct answers: {answers} ({guess_percent:02.0f}% accuracy). Average time: {avg:.4f}s. Streak: {streak}".format(
+            result_output += " Correct: {answers} ({guess_percent:d}% accuracy).".format(
                 answers=player.total_correct_answers,
-                guess_percent=(
+                guess_percent=(round(
                     player.total_correct_answers /
                     player.total_guesses *
-                    100),
+                    100))                
+            )
+            result_output += " Average time: {avg:.1f}s. Streak: {streak}".format(
                 avg=player.average_answer_time,
                 streak=player.highest_score_streak,
             )
+
         result_output += '\n'
+
     bot_say('{}'.format(result_output))
     logger.info('OUT: %s', result_output)
     fastest_time, fastest_user = Player.order_player_results(
@@ -304,28 +311,48 @@ def check_if_points_escalated():
 
     if POINT_ESCALATION_OFFERED is False and CLUES_OFFERED is 0:
         point_weight = POINT_DEFAULT_WEIGHT
-    if time.time()-last_correct_answer >= float(SECONDS_NO_GUESSES):
-        if POINT_ESCALATION_OFFERED is False:
-            point_weight = 2
-            bot_say('There have not been any correct guesses in {} seconds. Next correct answer worth {} points!'.format(
-                SECONDS_NO_GUESSES, point_weight))
-            logger.info('Point escalation')
-            POINT_ESCALATION_OFFERED = True
-    if time.time()-last_correct_answer >= float(SECONDS_UNTIL_CLUE) and CLUES_OFFERED == 0 and QUIZ_MODE == 'QA':
+    if (
+        time.time() - last_correct_answer >= float(SECONDS_NO_GUESSES)
+        and not POINT_ESCALATION_OFFERED
+    ):
+        point_weight = 2
+        logger.info(f'Point escalation to {point_weight}')
+        bot_say(
+            'There have not been any correct guesses in {} seconds. '
+            'Next correct answer worth {} points!'.format(
+                SECONDS_NO_GUESSES, point_weight
+            )
+        )
+        POINT_ESCALATION_OFFERED = True
+    elif (
+        time.time() - last_correct_answer >= float(SECONDS_UNTIL_CLUE)
+        and CLUES_OFFERED == 0
+        and QUIZ_MODE == 'QA'
+    ):
         point_weight = 0.5
-        bot_say('There have not been any correct guesses in {} seconds. Next answer now worth {} points with a clue:'.format(
-            SECONDS_UNTIL_CLUE, point_weight))
-
+        logger.info(f'First Clue offered. {point_weight} points')
+        bot_say(
+            'There have not been any correct guesses in {} seconds. '
+            'Next answer now worth {} points with a clue:'.format(
+                SECONDS_UNTIL_CLUE, point_weight
+            )
+        )
         bot_say(cur_question.first_clue_text)
-        logger.info('Clue offered')
         CLUES_OFFERED = 1
-    if time.time()-last_correct_answer >= float(SECONDS_UNTIL_SECOND_CLUE) and CLUES_OFFERED == 1 and QUIZ_MODE == 'QA':
+    elif (
+        time.time() - last_correct_answer >= float(SECONDS_UNTIL_SECOND_CLUE)
+        and CLUES_OFFERED == 1
+        and QUIZ_MODE == 'QA'
+    ):
         point_weight = 0.1
-        bot_say('You are all terrible. No correct guesses in {} seconds. Next answer now worth {} points with a big clue:'.format(
-            SECONDS_UNTIL_SECOND_CLUE, point_weight))
-
+        logger.info(f'Second Clue offered. {point_weight} points')
+        bot_say(
+            'You are all terrible. No correct guesses in {} seconds. '
+            'Next answer now worth {} points with a big clue:'.format(
+                SECONDS_UNTIL_SECOND_CLUE, point_weight
+            )
+        )
         bot_say(cur_question.second_clue_text)
-        logger.info('Second Clue offered')
         CLUES_OFFERED = 2
 
     return point_weight
@@ -339,7 +366,21 @@ def toggle(var):
 
 
 def parse_message(read_line_object):
-    cleaned = clean_answer(read_line_object[0]['text'])
+    # Sample message from Slack
+    # [
+    #     {
+    #         'type': 'message',
+    #         'user': 'UC7HXJ319'
+    #         'text': 'a',
+    #         'client_msg_id': 'a898be5b-2cdf-40f4-b9c9-220b8c81b431',
+    #         'team': 'TC75G1A3B',
+    #         'channel': 'CCAMPJ57E',
+    #         'event_ts': '1534609801.000200',
+    #         'ts': '1534609801.000200'
+    #     }
+    # ]
+    orig_msg = read_line_object[0]['text']
+    cleaned = clean_answer(orig_msg)
     user = read_line_object[0]['user']
     time_at = read_line_object[0]['ts']
     channel = read_line_object[0]['channel']
@@ -360,16 +401,12 @@ def parse_message(read_line_object):
             ANTIPABLO_LETTERS = toggle(ANTIPABLO_LETTERS)
             logger.info(f'Setting ANTIPABLO_LETTERS to {ANTIPABLO_LETTERS}')
         if cleaned.startswith('say'):
-            bot_say('<!here> ' + read_line_object[0]['text'][4:])
+            bot_say('<!here> ' + orig_msg[4:])
 
-    logger.info("IN: {time_now} - At {time_msg} (event_ts: {event_ts}) User {user} says: '{orig}'. Cleaned: '{cleaned}'".format(
-        user=user,
-        time_now=time.time(),
-        time_msg=time_at,
-        orig=read_line_object[0]['text'],
-        event_ts=event_ts,
-        cleaned=cleaned
-    ))
+    logger.info(
+        f"IN: {time.time()} - At {time_at} (event_ts: {event_ts}) "
+        f"User {user} says: '{orig_msg}'. Cleaned: '{cleaned}'"
+    )
     return (user, time_at, cleaned)
 
 
@@ -426,9 +463,10 @@ class Player:
                 logger.debug(f'Combo breaker!')
                 bonus_points = get_combo_breaker_points(prev.score_streak)
                 bot_say(
-                    f":zap: C-C-C-COMBO BREAKER! :zap: <@{prev.user_id}>'s streak :cut_of_meat: "
-                    f"of {prev.score_streak} has been broken! :sob: "
-                    f"{bonus_points} bonus point{check_plural(bonus_points)} to <@{self.user_id}> :tada:"
+                    f":zap: C-C-C-COMBO BREAKER! :zap: <@{prev.user_id}>'s "
+                    f"streak :cut_of_meat: of {prev.score_streak} has been broken! :sob: "
+                    f"{bonus_points} bonus point{check_plural(bonus_points)} "
+                    f"to <@{self.user_id}> :tada:"
                 )
                 self.score += bonus_points
                 self.bonus_score += bonus_points
@@ -611,7 +649,9 @@ def ask_question(question_id):
         question_id, q.answers))
     # PM QUIZ_MASTER (hardcoded channel for now)
     bot_say(
-        f'Asked question {q.question} {q.get_answer_parent()} for answer: {q.answers}', QUIZ_MASTER_DIRECT_CHAT)
+        f'Asked question {q.question} {q.get_answer_parent()} for answer: {q.answers}',
+        QUIZ_MASTER_DIRECT_CHAT
+    )
 
     if OFFLINE:
         # Normal flow is to set these times based on the confirmation response
@@ -652,31 +692,38 @@ def game_loop():
         while sc.server.connected is False:
             logger.info('Waiting for connection..')
             time.sleep(1)
+
+        # Post starting messages when first connected
         if sc.server.connected is True:
             logger.info('Connected')
             # Without the sleep, connected seems to be true, but a message can't be sent?
             time.sleep(1)
             if QUIZ_MODE == 'QA':
-                bot_say('<!here> Quiz starting. {title} - {description}.\n\nThere are *{total}* total questions.'.format(
-                    title=json_data['title'],
-                    total=QUESTION_COUNT,
-                    description=json_data['description']
-                ))
+                bot_say(
+                    '<!here> Quiz starting. {title} - {description}.\n\n'
+                    'There are *{total}* total questions.'.format(
+                        title=json_data['title'],
+                        total=QUESTION_COUNT,
+                        description=json_data['description']
+                    )
+                )
                 time.sleep(PAUSE_BEFORE_FIRST_QUESTION)
                 last_correct_answer = time.time()
                 # Makes new question instance in global cur_question
                 ask_question(CURRENT_QUESTION)
             else:
-                bot_say('<!here> Quiz starting. *{title}* - {description}.\n\nThere are *{total}* total answers. *{goldens} golden answers* :tada: worth *{golden_points}* points :moneybag: each. Chosen at random.'.format(
-                    title=json_data['title'],
-                    total=STARTING_ANSWER_COUNT,
-                    description=json_data['description'],
-                    goldens=len(golden_answers),
-                    golden_points=GOLDEN_ANSWER_POINTS
-                ))
-
-        # Sample message from Slack
-        # [{'type': 'message', 'user': 'UC7HXJ319', 'text': 'a', 'client_msg_id': 'a898be5b-2cdf-40f4-b9c9-220b8c81b431', 'team': 'TC75G1A3B', 'channel': 'CCAMPJ57E', 'event_ts': '1534609801.000200', 'ts': '1534609801.000200'}]
+                bot_say(
+                    '<!here> Quiz starting. *{title}* - {description}.\n\n'
+                    'There are *{total}* total answers. *{goldens} golden answers*'
+                    ':tada: worth *{golden_points}* points :moneybag: each.'
+                    'Chosen at random.'.format(
+                        title=json_data['title'],
+                        total=STARTING_ANSWER_COUNT,
+                        description=json_data['description'],
+                        goldens=len(golden_answers),
+                        golden_points=GOLDEN_ANSWER_POINTS
+                    )
+                )
 
         # Main game loop
 
@@ -718,7 +765,9 @@ def game_loop():
                 and not question_asked
                 and (last_correct_answer + float(SECONDS_BETWEEN_ANSWER_AND_QUESTION)) <= time.time()
             ):
-                logger.debug('Wait time after correct answer has been reached')
+                logger.debug(
+                    'Waited {SECONDS_BETWEEN_ANSWER_AND_QUESTION} seconds after correct answer'
+                )
                 CURRENT_QUESTION = CURRENT_QUESTION+1
                 REMAINING_QUESTIONS = REMAINING_QUESTIONS-1
                 if REMAINING_QUESTIONS != 0:
@@ -752,22 +801,29 @@ def game_loop():
                     question_answered_correctly = True
                     question_asked = False
                     logger.info(
-                        f'Answer found. Waiting for {SECONDS_BETWEEN_ANSWER_AND_QUESTION} seconds before asking next')
+                        f'Answer found. Waiting for {SECONDS_BETWEEN_ANSWER_AND_QUESTION} '
+                        'seconds before asking next'
+                    )
 
                     if guess in golden_answers:
                         bot_reaction(msg_timestamp=time_at, emoji='tada')
                         point_weight = GOLDEN_ANSWER_POINTS
-                        bot_say('A Golden answer was found! "{}" :tada: by user <@{}>. {} points!'.format(
-                            guess, user, point_weight))
+                        bot_say(
+                            f'A Golden answer was found! "{guess}" :tada: by user <@{user}>. '
+                            f'{point_weight} points!'
+                        )
                     else:
-                        bot_say('Answer found! "{guess}" {answer_parent} by <@{user}>. {points} point{plural}!'.format(
-                            guess=guess,
-                            user=user,
-                            # TODO: Refactor with Question class:
-                            answer_parent=cur_question.get_answer_parent(),
-                            points=point_weight,
-                            plural=check_plural(point_weight)
-                        ))
+                        bot_say(
+                            'Answer found! "{guess}" {answer_parent} by <@{user}>. '
+                            '{points} point{plural}!'.format(
+                                guess=guess,
+                                user=user,
+                                # TODO: Refactor with Question class:
+                                answer_parent=cur_question.get_answer_parent(),
+                                points=point_weight,
+                                plural=check_plural(point_weight)
+                            )
+                        )
 
                     player.inc_score(point_weight)
                     player.answer_time(last_correct_answer-last_question_time)
