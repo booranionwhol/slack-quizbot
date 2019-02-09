@@ -66,6 +66,7 @@ QUESTION_COUNT = 0
 REMAINING_QUESTIONS = 0
 POINT_ESCALATION_OFFERED = False
 CLUES_OFFERED = 0
+point_weight = 0
 
 question_answered_correctly = False
 question_asked = False
@@ -594,6 +595,8 @@ def check_plural(num):
 
 def ask_question(question_id):
     global answers, question_asked, question_answered_correctly, cur_question
+    # Needs to be global to reset after a question timeout
+    global POINT_ESCALATION_OFFERED, point_weight, CLUES_OFFERED
     question_answered_correctly = False
 
     # Instantiate question object, set global. Pass properly with later refactor
@@ -617,6 +620,10 @@ def ask_question(question_id):
         last_question_time = time.time()
         last_correct_answer = last_question_time
 
+    POINT_ESCALATION_OFFERED = False
+    point_weight = POINT_DEFAULT_WEIGHT
+    CLUES_OFFERED = 0
+
 
 def get_answer_parent(question_id):
     try:
@@ -634,151 +641,162 @@ def get_answer_parent(question_id):
 # \____/_/  |_/_/  /_/_____/  /_____/\____/\____/_/
 
 
-if sc.rtm_connect(with_team_state=True):
+def game_loop():
+    # Yuck!
+    global CURRENT_QUESTION, REMAINING_QUESTIONS, point_weight, answers, \
+        last_correct_answer, question_answered_correctly, question_asked, \
+        POINT_ESCALATION_OFFERED, CLUES_OFFERED, answers_found, cur_question
 
-    while sc.server.connected is False:
-        logger.info('Waiting for connection..')
-        time.sleep(1)
-    if sc.server.connected is True:
-        logger.info('Connected')
-        # Without the sleep, connected seems to be true, but a message can't be sent?
-        time.sleep(1)
-        if QUIZ_MODE == 'QA':
-            bot_say('<!here> Quiz starting. {title} - {description}.\n\nThere are *{total}* total questions.'.format(
-                title=json_data['title'],
-                total=QUESTION_COUNT,
-                description=json_data['description']
-            ))
-            time.sleep(PAUSE_BEFORE_FIRST_QUESTION)
-            last_correct_answer = time.time()
-            # Makes new question instance in global cur_question
-            ask_question(CURRENT_QUESTION)
-        else:
-            bot_say('<!here> Quiz starting. *{title}* - {description}.\n\nThere are *{total}* total answers. *{goldens} golden answers* :tada: worth *{golden_points}* points :moneybag: each. Chosen at random.'.format(
-                title=json_data['title'],
-                total=STARTING_ANSWER_COUNT,
-                description=json_data['description'],
-                goldens=len(golden_answers),
-                golden_points=GOLDEN_ANSWER_POINTS
-            ))
+    if sc.rtm_connect(with_team_state=True):
 
-    # Sample message from Slack
-    # [{'type': 'message', 'user': 'UC7HXJ319', 'text': 'a', 'client_msg_id': 'a898be5b-2cdf-40f4-b9c9-220b8c81b431', 'team': 'TC75G1A3B', 'channel': 'CCAMPJ57E', 'event_ts': '1534609801.000200', 'ts': '1534609801.000200'}]
-
-    # Main game loop
-
-    while sc.server.connected is True:
-        # End the quiz if no answers left
-        if QUIZ_MODE == 'QA':
-            if REMAINING_QUESTIONS == 0:
-                quiz_results(sc, results_object)
-        else:
-            if len(answers) == 0:
-                quiz_results(sc, results_object)
-
-        # Set the points available for the next answer
-        point_weight = check_if_points_escalated()
-
-        # If we hit the question timeout, give up and move on to the next question
-        if (
-            question_asked
-            and (time.time() - last_question_time >= float(QUESTION_TIMEOUT))
-            and QUIZ_MODE == 'QA'
-        ):
-            logger.info(
-                f'Question timeout ({QUESTION_TIMEOUT}) reached. Giving up waiting.')
-            # Pretend a question was answered to fool the rest of the loop
-            question_answered_correctly = True
-            question_asked = False
-            last_correct_answer = time.time()
-
-            bot_say(
-                f'Too hard or am I broken? '
-                f'The answer was: {cur_question.answers} {cur_question.get_answer_parent()}. '
-                f'Moving on to next question...'
-            )
-
-        # Check if we've waited SECONDS_BETWEEN_ANSWER_AND_QUESTION before asking next Q
-        if (
-            QUIZ_MODE == 'QA'
-            and question_answered_correctly
-            and not question_asked
-            and (last_correct_answer + float(SECONDS_BETWEEN_ANSWER_AND_QUESTION)) <= time.time()
-        ):
-            logger.debug('Wait time after correct answer has been reached')
-            CURRENT_QUESTION = CURRENT_QUESTION+1
-            REMAINING_QUESTIONS = REMAINING_QUESTIONS-1
-            if REMAINING_QUESTIONS != 0:
+        while sc.server.connected is False:
+            logger.info('Waiting for connection..')
+            time.sleep(1)
+        if sc.server.connected is True:
+            logger.info('Connected')
+            # Without the sleep, connected seems to be true, but a message can't be sent?
+            time.sleep(1)
+            if QUIZ_MODE == 'QA':
+                bot_say('<!here> Quiz starting. {title} - {description}.\n\nThere are *{total}* total questions.'.format(
+                    title=json_data['title'],
+                    total=QUESTION_COUNT,
+                    description=json_data['description']
+                ))
+                time.sleep(PAUSE_BEFORE_FIRST_QUESTION)
+                last_correct_answer = time.time()
+                # Makes new question instance in global cur_question
                 ask_question(CURRENT_QUESTION)
+            else:
+                bot_say('<!here> Quiz starting. *{title}* - {description}.\n\nThere are *{total}* total answers. *{goldens} golden answers* :tada: worth *{golden_points}* points :moneybag: each. Chosen at random.'.format(
+                    title=json_data['title'],
+                    total=STARTING_ANSWER_COUNT,
+                    description=json_data['description'],
+                    goldens=len(golden_answers),
+                    golden_points=GOLDEN_ANSWER_POINTS
+                ))
 
-        msg_counter = 0
-        for read_msg in sc.rtm_read():
-            msg_counter += 1
-            message = Message(read_msg)
-            if not message.is_guess:
-                continue  # Read next message
+        # Sample message from Slack
+        # [{'type': 'message', 'user': 'UC7HXJ319', 'text': 'a', 'client_msg_id': 'a898be5b-2cdf-40f4-b9c9-220b8c81b431', 'team': 'TC75G1A3B', 'channel': 'CCAMPJ57E', 'event_ts': '1534609801.000200', 'ts': '1534609801.000200'}]
 
-            # Quick hack to avoid more work after Message became a class. Awaiting refactor
-            (user, time_at, guess) = (message.user, message.time_at, message.guess)
+        # Main game loop
 
-            player = Player.load_player(user)
+        while sc.server.connected is True:
+            # End the quiz if no answers left
+            if QUIZ_MODE == 'QA':
+                if REMAINING_QUESTIONS == 0:
+                    quiz_results(sc, results_object)
+            else:
+                if len(answers) == 0:
+                    quiz_results(sc, results_object)
 
-            if 'results' in guess and user == QUIZ_MASTER:
-                quiz_results(sc, results_object, forced=True)
+            # Set the points available for the next answer
+            point_weight = check_if_points_escalated()
 
-            player.total_guesses += 1
-
-            # Answer was right, but already found
-            if guess in answers_found:
-                bot_reaction(msg_timestamp=time_at,
-                             emoji='snail')
-            # Right answer
-            if guess in answers:
-                last_correct_answer = float(time_at)
+            # If we hit the question timeout, give up and move on to the next question
+            if (
+                question_asked
+                and (time.time() - last_question_time >= float(QUESTION_TIMEOUT))
+                and QUIZ_MODE == 'QA'
+            ):
+                logger.info(
+                    f'Question timeout ({QUESTION_TIMEOUT}) reached. Giving up waiting.')
+                # Pretend a question was answered to fool the rest of the loop
                 question_answered_correctly = True
                 question_asked = False
-                logger.info(
-                    f'Answer found. Waiting for {SECONDS_BETWEEN_ANSWER_AND_QUESTION} seconds before asking next')
+                last_correct_answer = time.time()
 
-                if guess in golden_answers:
-                    bot_reaction(msg_timestamp=time_at, emoji='tada')
-                    point_weight = GOLDEN_ANSWER_POINTS
-                    bot_say('A Golden answer was found! "{}" :tada: by user <@{}>. {} points!'.format(
-                        guess, user, point_weight))
-                else:
-                    bot_say('Answer found! "{guess}" {answer_parent} by <@{user}>. {points} point{plural}!'.format(
-                        guess=guess,
-                        user=user,
-                        # TODO: Refactor with Question class:
-                        answer_parent=cur_question.get_answer_parent(),
-                        points=point_weight,
-                        plural=check_plural(point_weight)
-                    ))
+                bot_say(
+                    f'Too hard or am I broken? '
+                    f'The answer was: {cur_question.answers} {cur_question.get_answer_parent()}. '
+                    f'Moving on to next question...'
+                )
 
-                player.inc_score(point_weight)
-                player.answer_time(last_correct_answer-last_question_time)
+            # Check if we've waited SECONDS_BETWEEN_ANSWER_AND_QUESTION before asking next Q
+            if (
+                QUIZ_MODE == 'QA'
+                and question_answered_correctly
+                and not question_asked
+                and (last_correct_answer + float(SECONDS_BETWEEN_ANSWER_AND_QUESTION)) <= time.time()
+            ):
+                logger.debug('Wait time after correct answer has been reached')
+                CURRENT_QUESTION = CURRENT_QUESTION+1
+                REMAINING_QUESTIONS = REMAINING_QUESTIONS-1
+                if REMAINING_QUESTIONS != 0:
+                    ask_question(CURRENT_QUESTION)
 
-                bot_reaction(msg_timestamp=time_at,
-                             emoji='heavy_check_mark')
+            msg_counter = 0
+            for read_msg in sc.rtm_read():
+                msg_counter += 1
+                message = Message(read_msg)
+                if not message.is_guess:
+                    continue  # Read next message
 
-                # Not the best way if the list is huge? Or if there's dupes?
-                answers.remove(guess)
-                answers_found.append(guess)
-                if QUIZ_MODE != 'QA':
-                    bot_say("There are {} answers left".format(len(answers)))
+                # Quick hack to avoid more work after Message became a class. Awaiting refactor
+                (user, time_at, guess) = (
+                    message.user, message.time_at, message.guess)
 
-                # Reset point offer increase
-                POINT_ESCALATION_OFFERED = False
-                CLUES_OFFERED = 0
-                point_weight = POINT_DEFAULT_WEIGHT
+                player = Player.load_player(user)
 
-        # rtm_read() says it makes a list of multiple events, but only ever seems to have 1?
-        # If it *was* 0, then pause before next read.
-        if msg_counter == 0:
-            # logger.debug('Found %d messages in websocket', msg_counter)
-            # logger.debug('Ending websocket read loop. Sleeping %f',
-            #              WEBSOCKET_READLOOP_SLEEP)
-            time.sleep(WEBSOCKET_READLOOP_SLEEP)
+                if 'results' in guess and user == QUIZ_MASTER:
+                    quiz_results(sc, results_object, forced=True)
 
-else:
-    print("Connection Failed")
+                player.total_guesses += 1
+
+                # Answer was right, but already found
+                if guess in answers_found:
+                    bot_reaction(msg_timestamp=time_at,
+                                 emoji='snail')
+                # Right answer
+                if guess in answers:
+                    last_correct_answer = float(time_at)
+                    question_answered_correctly = True
+                    question_asked = False
+                    logger.info(
+                        f'Answer found. Waiting for {SECONDS_BETWEEN_ANSWER_AND_QUESTION} seconds before asking next')
+
+                    if guess in golden_answers:
+                        bot_reaction(msg_timestamp=time_at, emoji='tada')
+                        point_weight = GOLDEN_ANSWER_POINTS
+                        bot_say('A Golden answer was found! "{}" :tada: by user <@{}>. {} points!'.format(
+                            guess, user, point_weight))
+                    else:
+                        bot_say('Answer found! "{guess}" {answer_parent} by <@{user}>. {points} point{plural}!'.format(
+                            guess=guess,
+                            user=user,
+                            # TODO: Refactor with Question class:
+                            answer_parent=cur_question.get_answer_parent(),
+                            points=point_weight,
+                            plural=check_plural(point_weight)
+                        ))
+
+                    player.inc_score(point_weight)
+                    player.answer_time(last_correct_answer-last_question_time)
+
+                    bot_reaction(msg_timestamp=time_at,
+                                 emoji='heavy_check_mark')
+
+                    # Not the best way if the list is huge? Or if there's dupes?
+                    answers.remove(guess)
+                    answers_found.append(guess)
+                    if QUIZ_MODE != 'QA':
+                        bot_say("There are {} answers left".format(len(answers)))
+
+                    # Reset point offer increase
+                    POINT_ESCALATION_OFFERED = False
+                    CLUES_OFFERED = 0
+                    point_weight = POINT_DEFAULT_WEIGHT
+
+            # rtm_read() says it makes a list of multiple events, but only ever seems to have 1?
+            # If it *was* 0, then pause before next read.
+            if msg_counter == 0:
+                # logger.debug('Found %d messages in websocket', msg_counter)
+                # logger.debug('Ending websocket read loop. Sleeping %f',
+                #              WEBSOCKET_READLOOP_SLEEP)
+                time.sleep(WEBSOCKET_READLOOP_SLEEP)
+
+    else:
+        print("Connection Failed")
+
+
+if __name__ == '__main__':
+    game_loop()
