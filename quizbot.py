@@ -238,7 +238,8 @@ def quiz_results(client, results_object, forced=False):
     #     # TODO: add_high_streak_bonus_to_streakers()
     #     pass
 
-    for index, result in enumerate(Player.order_player_results()):
+    player_results_by_points = Player.order_player_results()
+    for index, result in enumerate(player_results_by_points):
         score = result[0]
         user_id = result[1]
         player = Player.load_player(user_id)
@@ -246,7 +247,7 @@ def quiz_results(client, results_object, forced=False):
         # Include anyone who made a guess in the results table.
         result_output += "{pos} {medal}) <@{user}>, score: {score:.1f}{bonus}.".format(
             pos=ordinal(index+1),
-            medal=podium_medal(index+1, Player.order_player_results()),
+            medal=podium_medal(index+1, player_results_by_points),
             user=user_id,
             score=score,
             bonus=check_for_bonus(player.bonus_score),
@@ -276,8 +277,7 @@ def quiz_results(client, results_object, forced=False):
         fastest_user=fastest_user, fastest_time=fastest_time))
     if Player.high_streakers:
         bot_say(RESULTS_STREAKERS_MSG)
-    logger.info('Players ordered by points: {}'.format(
-        Player.order_player_results()))
+    logger.info(f'Players ordered by points: {player_results_by_points}')
     sys.exit(0)
 
 

@@ -20,6 +20,12 @@ player2.inc_score(2)
 # player2.inc_score(1)
 # player2.inc_score(1)
 
+player3 = Player('CCCC')
+player3.total_guesses += 4
+player3.inc_score(1)
+
+player4 = Player('POOP')
+player4.total_guesses += 10
 
 logger.info(Player.dump_instances())
 
