@@ -781,6 +781,7 @@ def game_loop():
                     f'The answer was: *{cur_question.answers}* {cur_question.get_answer_parent()}. '
                     f'Moving on to next question...'
                 )
+                timedout_answers = answers # Save to check for cheaky guesses
                 answers = ''  # Clear, so a player can't guess after we've hit the timeout
 
             # Check if we've waited SECONDS_BETWEEN_ANSWER_AND_QUESTION before asking next Q
@@ -816,6 +817,11 @@ def game_loop():
 
                 player.total_guesses += 1
 
+                try:
+                    if guess in timedout_answers:
+                        bot_reaction(msg_timestamp=time_at, emoji='angry')
+                except:
+                    pass
                 # Answer was right, but already found
                 if guess in answers_found:
                     bot_reaction(msg_timestamp=time_at,
