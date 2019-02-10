@@ -760,7 +760,8 @@ def game_loop():
                     quiz_results(sc, results_object)
 
             # Set the points available for the next answer
-            point_weight = check_if_points_escalated()
+            if question_asked:
+                point_weight = check_if_points_escalated()
 
             # If we hit the question timeout, give up and move on to the next question
             if (
@@ -776,8 +777,8 @@ def game_loop():
                 last_correct_answer = time.time()
 
                 bot_say(
-                    f'Too hard or am I broken? '
-                    f'The answer was: {cur_question.answers} {cur_question.get_answer_parent()}. '
+                    f':cold_sweat: :dizzy_face: Too hard or am I broken:interrobang:  '
+                    f'The answer was: *{cur_question.answers}* {cur_question.get_answer_parent()}. '
                     f'Moving on to next question...'
                 )
                 answers = ''  # Clear, so a player can't guess after we've hit the timeout
