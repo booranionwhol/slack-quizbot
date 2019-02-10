@@ -90,6 +90,8 @@ last_correct_answer = 0.0
 ANTIPABLO_SPACE = False
 ANTIPABLO_LETTERS = False
 
+RESULTS_STREAKERS_MSG = ''
+
 
 def select_golden_answers():
     random.seed(os.urandom(1024))
@@ -115,8 +117,9 @@ with open(QUESTION_FILE, encoding='utf-8') as file:
         STARTING_ANSWER_COUNT = len(answers)
         select_golden_answers()
 
-logger.info(answers)
-logger.info('golden: {}'.format(golden_answers))
+if QUIZ_MODE != 'QA':
+    logger.info(answers)
+    logger.info('golden: {}'.format(golden_answers))
 
 
 if CHEAT_TO_RESULTS:
@@ -182,7 +185,45 @@ def check_for_bonus(points):
         return ''
 
 
+def allocate_high_streak_bonus_points():
+    global RESULTS_STREAKERS_MSG
+    # Award points to the player(s) with the highest streak
+    # If a tie, split the points evenly.
+
+    def at_user(u):
+        return f'<@{u}>'
+
+    if Player.high_streakers:
+        points_to_share = get_combo_breaker_points(Player.highest_streak) * 2
+        high_streak_bonus = points_to_share / len(Player.high_streakers)
+
+        for streaker in Player.high_streakers:
+            player = Player.load_player(streaker)
+
+            player.score += high_streak_bonus
+            player.bonus_score += high_streak_bonus
+            logger.debug(
+                f'Highest streak bonus. {high_streak_bonus} to player {player.user_id}')
+
+        RESULTS_STREAKERS_MSG = f'Highest streak of the game ({Player.highest_streak}) by: '
+        RESULTS_STREAKERS_MSG += ', '.join(map(at_user, Player.high_streakers))
+        RESULTS_STREAKERS_MSG += f'. {high_streak_bonus} bonus points'
+        if len(Player.high_streakers) > 1:
+            RESULTS_STREAKERS_MSG += ' each! :broken_heart:'
+        else:
+            RESULTS_STREAKERS_MSG += '! :dollar:'
+
+
+def highest_streakers_emoji(player):
+    if player.user_id in Player.high_streakers:
+        return ' :gem:'
+    else:
+        return ''
+
+
 def quiz_results(client, results_object, forced=False):
+    allocate_high_streak_bonus_points()
+
     Player.dump_instances()
 
     if forced:
@@ -248,7 +289,9 @@ def bot_say(msg, channel=QUIZ_CHANNEL_ID):
         logger.debug(f'OUT: {msg}')
     else:
         logger.debug(f'OUT(PM): {msg}')
-    sc.rtm_send_message(channel, msg)
+    # Don't post to slack if we're being invoked from a tester script
+    if __name__ == '__main__':
+        sc.rtm_send_message(channel, msg)
 
 
 def goodbye():
@@ -517,7 +560,7 @@ class Player:
     @staticmethod
     def dump_instances():
         for user_id, player_instance in Player.instances.items():
-            logger.info('User: {}. Vars: {}'.format(
+            logger.info('Dump User: {}. Vars: {}'.format(
                 user_id, vars(player_instance)))
 
     @staticmethod
@@ -746,7 +789,7 @@ def game_loop():
                 and (last_correct_answer + float(SECONDS_BETWEEN_ANSWER_AND_QUESTION)) <= time.time()
             ):
                 logger.debug(
-                    'Waited {SECONDS_BETWEEN_ANSWER_AND_QUESTION} seconds after correct answer'
+                    f'Waited {SECONDS_BETWEEN_ANSWER_AND_QUESTION} seconds after correct answer'
                 )
                 CURRENT_QUESTION = CURRENT_QUESTION+1
                 REMAINING_QUESTIONS = REMAINING_QUESTIONS-1
