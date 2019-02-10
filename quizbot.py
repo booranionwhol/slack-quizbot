@@ -217,11 +217,12 @@ def quiz_results(client, results_object, forced=False):
                 guess_percent=(round(
                     player.total_correct_answers /
                     player.total_guesses *
-                    100))                
+                    100))
             )
-            result_output += " Average time: {avg:.1f}s. Streak: {streak}".format(
+            result_output += " Average time: {avg:.1f}s. Streak: {streak}{streak_emoji}".format(
                 avg=player.average_answer_time,
                 streak=player.highest_score_streak,
+                streak_emoji=highest_streakers_emoji(player)
             )
 
         result_output += '\n'
@@ -232,6 +233,8 @@ def quiz_results(client, results_object, forced=False):
         order_attribute='fastest_answer', reverse=False)[0]
     bot_say('Fastest answer time by <@{fastest_user}>: {fastest_time:.4f}s'.format(
         fastest_user=fastest_user, fastest_time=fastest_time))
+    if Player.high_streakers:
+        bot_say(RESULTS_STREAKERS_MSG)
     logger.info('Players ordered by points: {}'.format(
         Player.order_player_results()))
     sys.exit(0)
@@ -422,7 +425,8 @@ class Player:
     instances = {}
     has_streak = ''
     last_correct = ''
-    highest_streakers_streak = 0
+    highest_streak = 0
+    high_streakers = []
 
     def __init__(self, user_id):
         logger.info(f'New player seen. Adding {user_id}')
@@ -448,6 +452,17 @@ class Player:
             f'Adding {points} points. Total: {self.score}. '
             f'Answered: {self.total_correct_answers}'
         )
+
+    @staticmethod
+    def save_streak_record(user_id, streak):
+        if streak > Player.highest_streak:
+            Player.high_streakers = [user_id]
+            Player.highest_streak = streak
+        elif streak == Player.highest_streak:
+            if user_id not in Player.high_streakers:
+                Player.high_streakers.append(user_id)
+        else:
+            pass
 
     def inc_streak(self):
         # self is breaking someone else's combo
@@ -481,6 +496,7 @@ class Player:
             self.highest_score_streak = self.score_streak
 
         if self.score_streak >= STREAK_BONUS_THRESHOLD:
+            Player.save_streak_record(self.user_id, self.score_streak)
             bot_say(
                 f'<@{self.user_id}> just hit a streak of {self.score_streak} correct answers :fire:')
 
@@ -521,42 +537,6 @@ class Player:
                     )
         results_table.sort(reverse=reverse)
         return results_table
-
-    @staticmethod
-    def find_high_streak_players():
-        all_streaks = []
-        for user_id, player_instance in Player.instances.items():
-            if user_id == QUIZ_MASTER and SKIP_QUIZ_MASTER_IN_RESULTS:
-                pass
-            else:
-                if player_instance.highest_score_streak >= STREAK_BONUS_THRESHOLD:
-                    all_streaks.append(
-                        (player_instance.highest_score_streak, player_instance.user_id))
-        if not all_streaks:
-            return None  # Nobody got a streak over the threshold
-
-        all_streaks.sort(reverse=True)
-        highest_streakers = []
-        if len(all_streaks) == 1:
-            # Set to single user_id
-            highest_streakers = [all_streaks[0][1]]
-            Player.highest_streakers_streak = all_streaks[0][0]
-            return highest_streakers
-
-        first_item = all_streaks.pop(0)
-        highest_streakers.append(first_item[1])
-        next_item_lower = False
-        while not next_item_lower:
-            next_item = all_streaks.pop(0)
-            # Compare streak count to see if its a tie
-            if next_item[0] == first_item[0]:
-                highest_streakers.append(next_item[1])
-            else:
-                next_item_lower = True
-
-        # Get the streak num from the highest
-        Player.highest_streakers_streak = all_streaks[0][0]
-        return highest_streakers
 
 
 class Message:
