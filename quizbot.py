@@ -672,7 +672,7 @@ def ask_question(question_id):
         question_id, q.answers))
     # PM QUIZ_MASTER (hardcoded channel for now)
     bot_say(
-        f'Asked question {q.question} {q.get_answer_parent()} for answer: {q.answers}',
+        f'{q.answers} - {q.get_answer_parent()} for question {q.question}',
         QUIZ_MASTER_DIRECT_CHAT
     )
 
@@ -781,7 +781,7 @@ def game_loop():
                     f'The answer was: *{cur_question.answers}* {cur_question.get_answer_parent()}. '
                     f'Moving on to next question...'
                 )
-                timedout_answers = answers # Save to check for cheaky guesses
+                timedout_answers = answers  # Save to check for cheaky guesses
                 answers = ''  # Clear, so a player can't guess after we've hit the timeout
 
             # Check if we've waited SECONDS_BETWEEN_ANSWER_AND_QUESTION before asking next Q
