@@ -25,7 +25,7 @@ SECONDS_UNTIL_CLUE = 60  # Point decrease, and first clue offered
 SECONDS_UNTIL_SECOND_CLUE = 90  # Point decrease, second, bigger clue offered
 QUESTION_TIMEOUT = 120  # Give up and move to the next question
 # Non-blocking wait between a correct answer and next q
-SECONDS_BETWEEN_ANSWER_AND_QUESTION = 5
+SECONDS_BETWEEN_ANSWER_AND_QUESTION = 10
 POINT_DEFAULT_WEIGHT = 1
 STREAK_BONUS_THRESHOLD = 3
 GOLDEN_ANSWER_POINTS = 3
@@ -40,8 +40,6 @@ QUIZ_MASTER = os.environ['QUIZ_MASTER']
 SKIP_QUIZ_MASTER_IN_RESULTS = False  # Set to False for easier testing
 QUIZ_MASTER_DIRECT_CHAT = os.environ['QUIZ_MASTER_DIRECT_CHAT']
 QUIZ_CHANNEL_ID = os.environ['QUIZ_CHANNEL_ID']  # The Quiz channel
-# For quick debug to go straight to a fake results table.
-CHEAT_TO_RESULTS = False
 QUESTION_FILE = 'questions/qa_test.json'
 
 
@@ -122,22 +120,9 @@ if QUIZ_MODE != 'QA':
     logger.info('golden: {}'.format(golden_answers))
 
 
-if CHEAT_TO_RESULTS:
-    answers = []
-    results_object = {
-        "UC7HXJ319": {
-            "score": 9,
-            "total_correct_answers": 7
-        },
-        "UCDFY00HE": {
-            "score": 8,
-        },
-        "UCDFZPDHN": {
-            "score": 2,
-            "total_correct_answers": 1
-        }
-
-    }
+class Quiz():
+    mode = json_data.get('mode')
+    tiebreaker = json_data.get('tiebreaker')
 
 
 def get_username(user_id):
@@ -233,12 +218,14 @@ def quiz_results(client, results_object, forced=False):
 
     result_output = ""
 
-    # highest_streakers_results = Player.find_high_streak_players()
-    # if highest_streakers_results:
-    #     # TODO: add_high_streak_bonus_to_streakers()
-    #     pass
-
     player_results_by_points = Player.order_player_results()
+
+    users_tied = Player.test_if_tiebreaker(player_results_by_points)
+    if Quiz.tiebreaker and users_tied:
+        bot_say('.... wait! There is a tie for first place!')
+        bot_say(f'The following tiebreaker question is for '
+                f'{users_tied[0]} and {users_tied[1]} only!')
+
     for index, result in enumerate(player_results_by_points):
         score = result[0]
         user_id = result[1]
@@ -580,6 +567,22 @@ class Player:
                     )
         results_table.sort(reverse=reverse)
         return results_table
+
+    @staticmethod
+    def tiebreaker():
+        pass
+
+    @staticmethod
+    def test_if_tiebreaker(results):
+        # Each tuple in the results list is (0.0, 'PLAYER_ID')
+        p1 = Player.load_player(results[0][1])
+        p2 = Player.load_player(results[1][1])
+        if p1.score == p2.score:
+            logger.info(
+                f'Tie found ({p1.score}) between {p1.user_id} and {p2.user_id}')
+            return (p1.user_id, p2.user_id)
+        else:
+            return False
 
 
 class Message:
