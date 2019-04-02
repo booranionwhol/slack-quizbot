@@ -1,0 +1,70 @@
+{
+    "title": "Wikipedia city test",
+    "description": "Blizz blazz",
+    "mode": "QA",
+    "questions": [
+        {
+            "In the largest city of *Honduras*. What is the Population (2013 census) - \u2022\u00a0Urban[4]": [
+                "2,055,729",
+                "2,055,729",
+                "CLUETegucigalpa"
+            ]
+        },
+        {
+            "In the largest city of *Indonesia*. What is the *Population (2014) - \\u2022\\u00a0Metro\\u00a0density*": [
+                "4,383/km2 (11,350/sq\\u00a0mi)",
+                "4,383/km2 (11,350/sq\\u00a0mi)",
+                "CLUEJakarta"
+            ]
+        },
+        {
+            "In the largest city of *Congo, Republic of the*. What is the *Founded*": [
+                "1883",
+                "1883",
+                "CLUEBrazzaville"
+            ]
+        },
+        {
+            "In the largest city of *S\\u00e3o Tom\\u00e9 and Pr\\u00edncipe*. What is the *Founded*": [
+                "1485",
+                "1485",
+                "CLUES\\u00e3o Tom\\u00e9"
+            ]
+        },
+        {
+            "In the largest city of *Qatar*. What is the *Established*": [
+                "1825",
+                "1825",
+                "CLUEDoha"
+            ]
+        },
+        {
+            "In the second largest city of *Myanmar*. What is the *Area - \\u2022\\u00a0Cultural City*": [
+                "163.84\\u00a0km2 (63.26\\u00a0sq\\u00a0mi)",
+                "163.84\\u00a0km2 (63.26\\u00a0sq\\u00a0mi)",
+                "CLUEMandalay"
+            ]
+        },
+        {
+            "In the largest city of *Turkmenistan*. What is the *Area - \\u2022\\u00a0Total*": [
+                "440\\u00a0km2 (170\\u00a0sq\\u00a0mi)",
+                "440\\u00a0km2 (170\\u00a0sq\\u00a0mi)",
+                "CLUEAshgabat"
+            ]
+        },
+        {
+            "In the largest city of *Belarus*. What is the *Founded*": [
+                "1067",
+                "1067",
+                "CLUEMinsk"
+            ]
+        },
+        {
+            "In the second largest city of *Sweden*. What is the *Postal code*": [
+                "40xxx \\u2013 41xxx \\u2013 421xx \\u2013 427xx",
+                "40xxx \\u2013 41xxx \\u2013 421xx \\u2013 427xx",
+                "CLUEGothenburg"
+            ]
+        }
+    ]
+}
