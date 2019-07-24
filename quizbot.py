@@ -649,6 +649,9 @@ def ask_question(question_id):
     cur_question = Question(question_id)
     q = cur_question
 
+    # TODO: remove bold * for maths quiz
+    # The maths quiz for now has just one *, which slack seems to print
+    # But what if the question has two stars? How are they escaped?
     bot_say('Question {i}) *{question}*'.format(
         i=question_id+1, question=check_for_pablo(q.question)))
     # Set global
@@ -714,6 +717,10 @@ def game_loop():
                         total=QUESTION_COUNT,
                         description=json_data['description']
                     )
+                )
+                bot_say(
+                   'Quiz starting! - {}'.format(json_data['title']),
+                   QUIZ_MASTER_DIRECT_CHAT
                 )
                 time.sleep(PAUSE_BEFORE_FIRST_QUESTION)
                 last_correct_answer = time.time()
