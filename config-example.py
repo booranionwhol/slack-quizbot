@@ -21,5 +21,6 @@ COMBO_BREAKER_BONUS_POINTS_DEFAULT = 5  # Awarded if beyond the above matrix
 # HIGHEST_STREAK_BONUS_POINTS = x # For now use the COMBO_BREAKER_MATRIX? See what happens
 
 QUESTION_FILE = 'questions/capital_cities3.json'
+CLEAN_ANSWERS = True  # Disable for typing challenge and maths style quizes
 
 SKIP_QUIZ_MASTER_IN_RESULTS = True  # Set to False for easier testing

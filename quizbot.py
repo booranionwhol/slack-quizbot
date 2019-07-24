@@ -36,6 +36,12 @@ else:
 
 
 def clean_answer(text):
+    # TODO: Support full override of what chars are cleaned in the quiz json
+    # This is True or False for now
+    if not CLEAN_ANSWERS:
+        return text
+
+    # TODO: Maths quizes shouldn't clean '-'
     for character in ['?', '!', ',', '.', '\\', '\'', ':', '-']:
         text = text.replace(character, "")
     return text.lower()
@@ -723,8 +729,8 @@ def game_loop():
                     )
                 )
                 bot_say(
-                   'Quiz starting! - {}'.format(json_data['title']),
-                   QUIZ_MASTER_DIRECT_CHAT
+                    'Quiz starting! - {}'.format(json_data['title']),
+                    QUIZ_MASTER_DIRECT_CHAT
                 )
                 time.sleep(PAUSE_BEFORE_FIRST_QUESTION)
                 last_correct_answer = time.time()
