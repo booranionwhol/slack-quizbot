@@ -6,6 +6,7 @@ import json
 import sys
 from statistics import mean
 import logging
+from html import unescape
 from config import *
 
 FORMAT = '%(asctime)s %(name)s %(levelname)5s - %(message)s'
@@ -394,7 +395,10 @@ def parse_message(read_line_object):
     #         'ts': '1534609801.000200'
     #     }
     # ]
-    orig_msg = read_line_object[0]['text']
+
+    # Answers have & as &amp; Full unescape might be overkill
+    orig_msg = unescape(read_line_object[0]['text'])
+
     cleaned = clean_answer(orig_msg)
     user = read_line_object[0]['user']
     time_at = read_line_object[0]['ts']
