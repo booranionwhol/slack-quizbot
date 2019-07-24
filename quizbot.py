@@ -6,6 +6,7 @@ import json
 import sys
 from statistics import mean
 import logging
+from config import *
 
 FORMAT = '%(asctime)s %(name)s %(levelname)5s - %(message)s'
 logging.basicConfig(level=logging.DEBUG, format=FORMAT)
@@ -18,29 +19,10 @@ OFFLINE = False  # Allow telnet interface to simulate chat
 # Without this, we might hit a rate-limit on the Slack RTM
 WEBSOCKET_READLOOP_SLEEP = 0.1  # Pauses between reads when no messages waiting
 
-PAUSE_BEFORE_FIRST_QUESTION = 3
-# Point increase when nobody has guessed for X seconds. Should mean the current question is hard
-SECONDS_NO_GUESSES = 30
-SECONDS_UNTIL_CLUE = 60  # Point decrease, and first clue offered
-SECONDS_UNTIL_SECOND_CLUE = 90  # Point decrease, second, bigger clue offered
-QUESTION_TIMEOUT = 120  # Give up and move to the next question
-# Non-blocking wait between a correct answer and next q
-SECONDS_BETWEEN_ANSWER_AND_QUESTION = 10
-POINT_DEFAULT_WEIGHT = 1
-STREAK_BONUS_THRESHOLD = 3
-GOLDEN_ANSWER_POINTS = 3
-# Matrix of points awarded for breaking a streak
-# key: value = streak_broken_size: points_awarded
-COMBO_BREAKER_BONUS_POINTS = {1: 0, 2: 0, 3: 1, 4: 1, 5: 2, 6: 2, 7: 3, 8: 4}
-COMBO_BREAKER_BONUS_POINTS_DEFAULT = 5  # Awarded if beyond the above matrix
-# HIGHEST_STREAK_BONUS_POINTS = x # For now use the COMBO_BREAKER_MATRIX? See what happens
-
 # Slack user Id of user who can issue commands
 QUIZ_MASTER = os.environ['QUIZ_MASTER']
-SKIP_QUIZ_MASTER_IN_RESULTS = False  # Set to False for easier testing
 QUIZ_MASTER_DIRECT_CHAT = os.environ['QUIZ_MASTER_DIRECT_CHAT']
 QUIZ_CHANNEL_ID = os.environ['QUIZ_CHANNEL_ID']  # The Quiz channel
-QUESTION_FILE = 'questions/qa_test.json'
 
 
 # bot

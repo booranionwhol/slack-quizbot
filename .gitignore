@@ -104,3 +104,4 @@ venv.bak/
 .mypy_cache/
 shakespeare_complete.txt
 .vscode/launch.json
+config.py
