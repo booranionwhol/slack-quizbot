@@ -257,20 +257,6 @@ class Question():
         self.has_clues = False  # Flip if we find a clue, or autogen_clues is on
         self.autogen_clues = False
 
-        for key, value in json_data['questions'][q_id].items():
-            if key != "parent":
-                self.question = key
-                self.answers = [x.lower() for x in value]
-
-        try:
-            question_parent = json_data['questions'][q_id]['parent']
-            for key, value in question_parent.items():
-                # Assume only one item in "parent" key
-                self.parent_key = key
-                self.parent_value = value
-                self.has_parent = True
-        except:
-            self.has_parent = False
         if quiz.mode == 'QA':
             # TODO: Allow override in quiz json. 
             # TODO: Also allow curated clues in each question?
@@ -279,6 +265,21 @@ class Question():
                 self.has_clues = True
 
 
+        if quiz.mode == 'QA':
+            for key, value in json_data['questions'][q_id].items():
+                if key != "parent":
+                    self.question = key
+                    self.answers = [x.lower() for x in value]
+
+            try:
+                question_parent = json_data['questions'][q_id]['parent']
+                for key, value in question_parent.items():
+                    # Assume only one item in "parent" key
+                    self.parent_key = key
+                    self.parent_value = value
+                    self.has_parent = True
+            except:
+                self.has_parent = False
 
         if self.autogen_clues:
             # The type should really be an attribute forced in the quiz json. Or per Q
