@@ -106,6 +106,10 @@ class Quiz():
         self.mode = quiz_json.get('mode')
         self.tiebreaker = quiz_json.get('tiebreaker')
 
+        if self.mode == 'QA':
+            # Autogen all clues unless explicitly set to False
+            # Ie, maths quizes
+            self.autogen_clues = quiz_json.get('autogen_clues', True)
 
 
 quiz = Quiz(json_data)
@@ -251,6 +255,8 @@ class Question():
     # json_data should be read in future from a Quiz class?
     def __init__(self, q_id):
         logger.info(f'New question loaded. question_id: {q_id}')
+        self.has_clues = False  # Flip if we find a clue, or autogen_clues is on
+        self.autogen_clues = False
 
         for key, value in json_data['questions'][q_id].items():
             if key != "parent":
@@ -266,22 +272,31 @@ class Question():
                 self.has_parent = True
         except:
             self.has_parent = False
+        if quiz.mode == 'QA':
+            # TODO: Allow override in quiz json. 
+            # TODO: Also allow curated clues in each question?
+            if quiz.autogen_clues:
+                self.autogen_clues = True
+                self.has_clues = True
 
-        # The type should really be an attribute forced in the quiz json. Or per Q
-        if 'Anagram' in json_data['title']:
-            # First letter of first answer
-            self.first_clue = self.answers[0][0].upper()
-            self.first_clue_text = f'The first letter for *{self.question}* is *{self.first_clue}*'
 
-        else:  # Only NO VOWELS for now
-            vowels_clue_list = find_vowels(self.answers[0])
-            vowels_clue = ' '.join(vowels_clue_list[0:2]).upper()
-            self.first_clue_text = f'The first two vowels for *{self.question}* are: *{vowels_clue}*'
 
-        # First half of the first answer
-        answer = self.answers[0]
-        self.second_clue = answer[0:round(len(answer) / 2)].title()
-        self.second_clue_text = f'The *first half* of *{self.question}* is: *{self.second_clue}*'
+        if self.autogen_clues:
+            # The type should really be an attribute forced in the quiz json. Or per Q
+            if 'Anagram' in json_data['title']:
+                # First letter of first answer
+                self.first_clue = self.answers[0][0].upper()
+                self.first_clue_text = f'The first letter for *{self.question}* is *{self.first_clue}*'
+
+            else:  # Only NO VOWELS for now
+                vowels_clue_list = find_vowels(self.answers[0])
+                vowels_clue = ' '.join(vowels_clue_list[0:2]).upper()
+                self.first_clue_text = f'The first two vowels for *{self.question}* are: *{vowels_clue}*'
+
+            # First half of the first answer
+            answer = self.answers[0]
+            self.second_clue = answer[0:round(len(answer) / 2)].title()
+            self.second_clue_text = f'The *first half* of *{self.question}* is: *{self.second_clue}*'
 
     def get_answer_parent(self):
         if self.has_parent:
@@ -313,6 +328,7 @@ def check_if_points_escalated():
         time.time() - last_correct_answer >= float(SECONDS_UNTIL_CLUE)
         and CLUES_OFFERED == 0
         and QUIZ_MODE == 'QA'
+        and cur_question.has_clues
     ):
         point_weight = 0.5
         logger.info(f'First Clue offered. {point_weight} points')
@@ -328,6 +344,7 @@ def check_if_points_escalated():
         time.time() - last_correct_answer >= float(SECONDS_UNTIL_SECOND_CLUE)
         and CLUES_OFFERED == 1
         and QUIZ_MODE == 'QA'
+        and cur_question.has_clues
     ):
         point_weight = 0.1
         logger.info(f'Second Clue offered. {point_weight} points')
