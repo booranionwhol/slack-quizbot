@@ -1,0 +1,41 @@
+# These functions should really be in an appropriate Class
+# They are all generic and not related to the Bot, Results, or Questions for now
+
+
+def select_golden_answers():
+    random.seed(os.urandom(1024))
+    for _ in range(1, int(len(answers)/10)):
+        golden_random = random.choice(answers)
+        if golden_random not in golden_answers:
+            golden_answers.append(golden_random)
+
+
+def find_vowels(line):
+    """ Find all the vowels in the answer, to use for clues """
+    vowels = ['a', 'e', 'i', 'o', 'u']
+    clue_list = []
+    for letter in line.lower():
+        if letter in vowels:
+            clue_list.append(letter)
+    return clue_list
+
+
+def toggle(var):
+    if var == True:
+        return False
+    if var == False:
+        return True
+
+
+def check_plural(num):
+    if num == 1:
+        return ''
+    else:
+        return 's'
+
+
+def check_for_bonus(points):
+    if points > 0.0:
+        return f' (Bonus: {points})'
+    else:
+        return ''

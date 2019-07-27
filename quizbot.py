@@ -8,6 +8,7 @@ from statistics import mean
 import logging
 from html import unescape
 from config import *
+from misc_functions import *
 
 FORMAT = '%(asctime)s %(name)s %(levelname)5s - %(message)s'
 logging.basicConfig(level=logging.DEBUG, format=FORMAT)
@@ -79,15 +80,6 @@ ANTIPABLO_LETTERS = False
 
 RESULTS_STREAKERS_MSG = ''
 
-
-def select_golden_answers():
-    random.seed(os.urandom(1024))
-    for _ in range(1, int(len(answers)/10)):
-        golden_random = random.choice(answers)
-        if golden_random not in golden_answers:
-            golden_answers.append(golden_random)
-
-
 # Load up the questions
 with open(QUESTION_FILE, encoding='utf-8') as file:
     json_data = json.load(file)
@@ -148,13 +140,6 @@ def podium_medal(position, total_player_results):
     # Last place
     if position == len(total_player_results):
         return ':poop:'
-    else:
-        return ''
-
-
-def check_for_bonus(points):
-    if points > 0.0:
-        return f' (Bonus: {points})'
     else:
         return ''
 
@@ -270,20 +255,6 @@ def bot_say(msg, channel=QUIZ_CHANNEL_ID):
         sc.rtm_send_message(channel, msg)
 
 
-def goodbye():
-    bot_say('I have been terminated. NO MORE QUIZ. :tired_face:')
-
-
-def find_vowels(line):
-    """ Find all the vowels in the answer, to use for clues """
-    vowels = ['a', 'e', 'i', 'o', 'u']
-    clue_list = []
-    for letter in line.lower():
-        if letter in vowels:
-            clue_list.append(letter)
-    return clue_list
-
-
 class Question():
     # json_data should be read in future from a Quiz class?
     def __init__(self, q_id):
@@ -378,13 +349,6 @@ def check_if_points_escalated():
         CLUES_OFFERED = 2
 
     return point_weight
-
-
-def toggle(var):
-    if var == True:
-        return False
-    if var == False:
-        return True
 
 
 def parse_message(read_line_object):
@@ -642,13 +606,6 @@ def bot_reaction(msg_timestamp, emoji):
     )
 
 
-def check_plural(num):
-    if num == 1:
-        return ''
-    else:
-        return 's'
-
-
 def ask_question(question_id):
     global answers, question_asked, question_answered_correctly, cur_question
     # Needs to be global to reset after a question timeout
@@ -685,15 +642,6 @@ def ask_question(question_id):
     point_weight = POINT_DEFAULT_WEIGHT
     CLUES_OFFERED = 0
 
-
-def get_answer_parent(question_id):
-    try:
-        question_parent = json_data['questions'][question_id]['parent']
-        for key, value in question_parent.items():
-            # Assume only one item in "parent" key
-            return f'({key}: {value})'
-    except:
-        return ''
 
 #    _________    __  _________   __    ____  ____  ____
 #   / ____/   |  /  |/  / ____/  / /   / __ \/ __ \/ __ \
