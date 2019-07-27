@@ -122,19 +122,6 @@ def get_username(user_id):
     return response['user']['profile']['display_name']
 
 
-def ordinal(num):
-    # Taken from https://codereview.stackexchange.com/questions/41298/producing-ordinal-numbers
-    SUFFIXES = {1: 'st', 2: 'nd', 3: 'rd'}
-    # Checking for 10-20 because those are the digits that
-    # don't follow the normal counting scheme.
-    if 10 <= num % 100 <= 20:
-        suffix = 'th'
-    else:
-        # the second parameter is a default.
-        suffix = SUFFIXES.get(num % 10, 'th')
-    return str(num) + suffix
-
-
 def podium_medal(position, total_player_results):
     if position == 1:
         return ':first_place_medal:'
