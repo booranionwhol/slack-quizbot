@@ -102,8 +102,13 @@ if QUIZ_MODE != 'QA':
 
 
 class Quiz():
-    mode = json_data.get('mode')
-    tiebreaker = json_data.get('tiebreaker')
+    def __init__(self, quiz_json):
+        self.mode = quiz_json.get('mode')
+        self.tiebreaker = quiz_json.get('tiebreaker')
+
+
+
+quiz = Quiz(json_data)
 
 
 def get_username(user_id):
@@ -195,7 +200,7 @@ def quiz_results(client, results_object, forced=False):
     player_results_by_points = Player.order_player_results()
 
     users_tied = Player.test_if_tiebreaker(player_results_by_points)
-    if Quiz.tiebreaker and users_tied:
+    if quiz.tiebreaker and users_tied:
         bot_say('.... wait! There is a tie for first place!')
         bot_say(f'The following tiebreaker question is for '
                 f'{users_tied[0]} and {users_tied[1]} only!')
