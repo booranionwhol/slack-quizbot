@@ -49,7 +49,6 @@ def clean_answer(text):
 
 
 # Init some things. Should all go away with a future refactoring
-QUIZ_MODE = ''
 QUESTION_COUNT = 0
 REMAINING_QUESTIONS = 0
 POINT_ESCALATION_OFFERED = False
@@ -84,7 +83,6 @@ RESULTS_STREAKERS_MSG = ''
 with open(QUESTION_FILE, encoding='utf-8') as file:
     json_data = json.load(file)
     if json_data.get('mode') == 'QA':
-        QUIZ_MODE = 'QA'
         CURRENT_QUESTION = 0
         QUESTION_COUNT = len(json_data['questions'])
         REMAINING_QUESTIONS = QUESTION_COUNT
@@ -96,9 +94,7 @@ with open(QUESTION_FILE, encoding='utf-8') as file:
         STARTING_ANSWER_COUNT = len(answers)
         select_golden_answers()
 
-if QUIZ_MODE != 'QA':
-    logger.info(answers)
-    logger.info('golden: {}'.format(golden_answers))
+
 
 
 class Quiz():
@@ -114,6 +110,9 @@ class Quiz():
 
 quiz = Quiz(json_data)
 
+if quiz.mode not in ['QA','MultiChoice']:
+    logger.info(answers)
+    logger.info('golden: {}'.format(golden_answers))
 
 def get_username(user_id):
     if OFFLINE:
@@ -327,7 +326,7 @@ def check_if_points_escalated():
     elif (
         time.time() - last_correct_answer >= float(SECONDS_UNTIL_CLUE)
         and CLUES_OFFERED == 0
-        and QUIZ_MODE == 'QA'
+        and quiz.mode == 'QA'
         and cur_question.has_clues
     ):
         point_weight = 0.5
@@ -343,7 +342,7 @@ def check_if_points_escalated():
     elif (
         time.time() - last_correct_answer >= float(SECONDS_UNTIL_SECOND_CLUE)
         and CLUES_OFFERED == 1
-        and QUIZ_MODE == 'QA'
+        and quiz.mode == 'QA'
         and cur_question.has_clues
     ):
         point_weight = 0.1
@@ -676,7 +675,7 @@ def game_loop():
             logger.info('Connected')
             # Without the sleep, connected seems to be true, but a message can't be sent?
             time.sleep(1)
-            if QUIZ_MODE == 'QA':
+            if quiz.mode == 'QA':
                 bot_say(
                     '<!here> Quiz starting. {title} - {description}.\n\n'
                     'There are *{total}* total questions.'.format(
@@ -711,7 +710,7 @@ def game_loop():
 
         while sc.server.connected is True:
             # End the quiz if no answers left
-            if QUIZ_MODE == 'QA':
+            if quiz.mode == 'QA':
                 if REMAINING_QUESTIONS == 0:
                     quiz_results(sc, results_object)
             else:
@@ -726,7 +725,7 @@ def game_loop():
             if (
                 question_asked
                 and (time.time() - last_question_time >= float(QUESTION_TIMEOUT))
-                and QUIZ_MODE == 'QA'
+                and quiz.mode == 'QA'
             ):
                 logger.info(
                     f'Question timeout ({QUESTION_TIMEOUT}) reached. Giving up waiting.')
@@ -745,7 +744,7 @@ def game_loop():
 
             # Check if we've waited SECONDS_BETWEEN_ANSWER_AND_QUESTION before asking next Q
             if (
-                QUIZ_MODE == 'QA'
+                quiz.mode == 'QA'
                 and question_answered_correctly
                 and not question_asked
                 and (last_correct_answer + float(SECONDS_BETWEEN_ANSWER_AND_QUESTION)) <= time.time()
@@ -824,7 +823,7 @@ def game_loop():
                     # Not the best way if the list is huge? Or if there's dupes?
                     answers.remove(guess)
                     answers_found.append(guess)
-                    if QUIZ_MODE != 'QA':
+                    if quiz.mode != 'QA':
                         bot_say("There are {} answers left".format(len(answers)))
 
                     # Reset point offer increase
