@@ -257,6 +257,9 @@ class Question():
         self.has_clues = False  # Flip if we find a clue, or autogen_clues is on
         self.autogen_clues = False
 
+        # Slack module currently doesn't support setting mrkdown:false in the message
+        self.disable_markdown = False  # Set to true if markdown chars detected in text
+
         if quiz.mode == 'QA':
             # TODO: Allow override in quiz json. 
             # TODO: Also allow curated clues in each question?
@@ -268,7 +271,11 @@ class Question():
         if quiz.mode == 'QA':
             for key, value in json_data['questions'][q_id].items():
                 if key != "parent":
-                    self.question = key
+                    if check_for_markdown(key):
+                        self.question = key
+                        self.disable_markdown = True
+                    else:
+                        self.question = f'*{key}*'
                     self.answers = [x.lower() for x in value]
 
             try:
@@ -627,10 +634,7 @@ def ask_question(question_id):
     cur_question = Question(question_id)
     q = cur_question
 
-    # TODO: remove bold * for maths quiz
-    # The maths quiz for now has just one *, which slack seems to print
-    # But what if the question has two stars? How are they escaped?
-    bot_say('Question {i}) *{question}*'.format(
+    bot_say('Question {i}) {question}'.format(
         i=question_id+1, question=check_for_pablo(q.question)))
     # Set global
     answers = q.answers

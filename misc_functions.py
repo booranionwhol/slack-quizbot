@@ -52,3 +52,12 @@ def ordinal(num):
         # the second parameter is a default.
         suffix = SUFFIXES.get(num % 10, 'th')
     return str(num) + suffix
+
+
+def check_for_markdown(string):
+    # If any of these chars exist in the loaded question string. Disable slack markdown
+    SPECIAL_MARKDOWN_CHARS = ['*', '_', '~', '`']
+
+    for char in SPECIAL_MARKDOWN_CHARS:
+        if char in string:
+            return True
