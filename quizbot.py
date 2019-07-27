@@ -539,6 +539,8 @@ class Player:
 
     @staticmethod
     def test_if_tiebreaker(results):
+        if len(Player.instances) < 2:
+            return False
         # Each tuple in the results list is (0.0, 'PLAYER_ID')
         p1 = Player.load_player(results[0][1])
         p2 = Player.load_player(results[1][1])
