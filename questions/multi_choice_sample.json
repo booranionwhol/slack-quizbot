@@ -1,0 +1,15 @@
+{
+    "title": "Multi Choice - Sample testing quiz #1",
+    "description": "",
+    "mode": "MultiChoice",
+    "questions": [
+        {
+            "What is the capital of France?": [
+                "Paris",
+                "Texas",
+                "Bordeaux",
+                "Chicken"
+            ]
+        }
+    ]
+}

@@ -82,7 +82,7 @@ RESULTS_STREAKERS_MSG = ''
 # Load up the questions
 with open(QUESTION_FILE, encoding='utf-8') as file:
     json_data = json.load(file)
-    if json_data.get('mode') == 'QA':
+    if json_data.get('mode') in ['QA', 'MultiChoice']:
         CURRENT_QUESTION = 0
         QUESTION_COUNT = len(json_data['questions'])
         REMAINING_QUESTIONS = QUESTION_COUNT
@@ -95,8 +95,6 @@ with open(QUESTION_FILE, encoding='utf-8') as file:
         select_golden_answers()
 
 
-
-
 class Quiz():
     def __init__(self, quiz_json):
         self.mode = quiz_json.get('mode')
@@ -107,12 +105,19 @@ class Quiz():
             # Ie, maths quizes
             self.autogen_clues = quiz_json.get('autogen_clues', True)
 
+        if self.mode == 'MultiChoice':
+            self.multichoice = True
+            self.autogen_clues = False
+            global CLEAN_ANSWERS
+            CLEAN_ANSWERS = False
+
 
 quiz = Quiz(json_data)
 
-if quiz.mode not in ['QA','MultiChoice']:
+if quiz.mode not in ['QA', 'MultiChoice']:
     logger.info(answers)
     logger.info('golden: {}'.format(golden_answers))
+
 
 def get_username(user_id):
     if OFFLINE:
@@ -261,12 +266,36 @@ class Question():
         self.disable_markdown = False  # Set to true if markdown chars detected in text
 
         if quiz.mode == 'QA':
-            # TODO: Allow override in quiz json. 
+            # TODO: Allow override in quiz json.
             # TODO: Also allow curated clues in each question?
             if quiz.autogen_clues:
                 self.autogen_clues = True
                 self.has_clues = True
 
+        if quiz.mode == 'MultiChoice':
+            self.has_parent = False
+
+            q_object = json_data['questions'][q_id]
+            key, value = [x for x in q_object.items()][0]
+            if '*' not in key:
+                # Make the question bold. Answer multi choices won't be.
+                self.question = f'*{key}*'
+            multiple_choices = value
+            correct_choice = multiple_choices[0]
+            random.shuffle(multiple_choices)
+            self.num_choices = len(multiple_choices)
+
+            # What do we do with more than 5 choices?
+            #choice_letters = ['j', 'k', 'l', ';', '\'']
+            #choice_letters = ['a', 's', 'd', 'f', 'g']
+            #choice_letters = ['1', '2', '3', '4', '5']
+            choice_letters = ['a', 'b', 'c', 'd', 'e']
+            for i in range(self.num_choices):
+                choice = f'\n{choice_letters[i]}) {multiple_choices[i]}'
+                self.question += choice
+                if multiple_choices[i] == correct_choice:
+                    # Legacy hangup: answers is still a list of one.
+                    self.answers = [choice_letters[i]]
 
         if quiz.mode == 'QA':
             for key, value in json_data['questions'][q_id].items():
@@ -682,7 +711,7 @@ def game_loop():
             logger.info('Connected')
             # Without the sleep, connected seems to be true, but a message can't be sent?
             time.sleep(1)
-            if quiz.mode == 'QA':
+            if quiz.mode in ['QA', 'MultiChoice']:
                 bot_say(
                     '<!here> Quiz starting. {title} - {description}.\n\n'
                     'There are *{total}* total questions.'.format(
@@ -717,7 +746,7 @@ def game_loop():
 
         while sc.server.connected is True:
             # End the quiz if no answers left
-            if quiz.mode == 'QA':
+            if quiz.mode in ['QA', 'MultiChoice']:
                 if REMAINING_QUESTIONS == 0:
                     quiz_results(sc, results_object)
             else:
@@ -732,7 +761,7 @@ def game_loop():
             if (
                 question_asked
                 and (time.time() - last_question_time >= float(QUESTION_TIMEOUT))
-                and quiz.mode == 'QA'
+                and quiz.mode in ['QA', 'MultiChoice']
             ):
                 logger.info(
                     f'Question timeout ({QUESTION_TIMEOUT}) reached. Giving up waiting.')
@@ -751,7 +780,7 @@ def game_loop():
 
             # Check if we've waited SECONDS_BETWEEN_ANSWER_AND_QUESTION before asking next Q
             if (
-                quiz.mode == 'QA'
+                quiz.mode in ['QA', 'MultiChoice']
                 and question_answered_correctly
                 and not question_asked
                 and (last_correct_answer + float(SECONDS_BETWEEN_ANSWER_AND_QUESTION)) <= time.time()
@@ -830,7 +859,7 @@ def game_loop():
                     # Not the best way if the list is huge? Or if there's dupes?
                     answers.remove(guess)
                     answers_found.append(guess)
-                    if quiz.mode != 'QA':
+                    if quiz.mode not in ['QA', 'MultiChoice']:
                         bot_say("There are {} answers left".format(len(answers)))
 
                     # Reset point offer increase
