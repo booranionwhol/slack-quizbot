@@ -838,13 +838,16 @@ def game_loop():
                             f'{point_weight} points!'
                         )
                     else:
+                        answer_parent = cur_question.get_answer_parent()
+                        if answer_parent:
+                            answer_parent = answer_parent + ' '
                         bot_say(
-                            'Answer found! "{guess}" {answer_parent} by <@{user}>. '
+                            'Answer found! "{guess}" {answer_parent}by <@{user}>. '
                             '{points} point{plural}!'.format(
                                 guess=guess,
                                 user=user,
                                 # TODO: Refactor with Question class:
-                                answer_parent=cur_question.get_answer_parent(),
+                                answer_parent=answer_parent,
                                 points=point_weight,
                                 plural=check_plural(point_weight)
                             )
