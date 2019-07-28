@@ -291,11 +291,13 @@ class Question():
             #choice_letters = ['1', '2', '3', '4', '5']
             choice_letters = ['a', 'b', 'c', 'd', 'e']
             for i in range(self.num_choices):
-                choice = f'\n{choice_letters[i]}) {multiple_choices[i]}'
+                choice_letter = choice_letters[i]
+                choice = f'\n{choice_letter}) {multiple_choices[i]}'
                 self.question += choice
                 if multiple_choices[i] == correct_choice:
                     # Legacy hangup: answers is still a list of one.
-                    self.answers = [choice_letters[i]]
+                    self.answers = [choice_letter]
+                    self.real_answer = choice.lstrip('\n')
 
         if quiz.mode == 'QA':
             for key, value in json_data['questions'][q_id].items():
@@ -306,6 +308,7 @@ class Question():
                     else:
                         self.question = f'*{key}*'
                     self.answers = [x.lower() for x in value]
+                    self.real_answer = value
 
             try:
                 question_parent = json_data['questions'][q_id]['parent']
@@ -322,17 +325,17 @@ class Question():
             if 'Anagram' in json_data['title']:
                 # First letter of first answer
                 self.first_clue = self.answers[0][0].upper()
-                self.first_clue_text = f'The first letter for *{self.question}* is *{self.first_clue}*'
+                self.first_clue_text = f'The first letter for {self.question} is *{self.first_clue}*'
 
             else:  # Only NO VOWELS for now
                 vowels_clue_list = find_vowels(self.answers[0])
                 vowels_clue = ' '.join(vowels_clue_list[0:2]).upper()
-                self.first_clue_text = f'The first two vowels for *{self.question}* are: *{vowels_clue}*'
+                self.first_clue_text = f'The first two vowels for {self.question} are: *{vowels_clue}*'
 
             # First half of the first answer
             answer = self.answers[0]
             self.second_clue = answer[0:round(len(answer) / 2)].title()
-            self.second_clue_text = f'The *first half* of *{self.question}* is: *{self.second_clue}*'
+            self.second_clue_text = f'The *first half* of {self.question} is: *{self.second_clue}*'
 
     def get_answer_parent(self):
         if self.has_parent:
@@ -772,7 +775,7 @@ def game_loop():
 
                 bot_say(
                     f':cold_sweat: :dizzy_face: Too hard or am I broken:interrobang:  '
-                    f'The answer was: *{cur_question.answers}* {cur_question.get_answer_parent()}. '
+                    f'The answer was: {safe_embolden(cur_question.real_answer)} {cur_question.get_answer_parent()}. '
                     f'Moving on to next question...'
                 )
                 timedout_answers = answers  # Save to check for cheaky guesses
@@ -838,13 +841,17 @@ def game_loop():
                             f'{point_weight} points!'
                         )
                     else:
+                        real_answer = guess  # TODO: Read original formatted answer
+                        if quiz.mode == 'MultiChoice':
+                            real_answer = cur_question.real_answer
+
                         answer_parent = cur_question.get_answer_parent()
                         if answer_parent:
                             answer_parent = answer_parent + ' '
                         bot_say(
-                            'Answer found! "{guess}" {answer_parent}by <@{user}>. '
+                            'Answer found! "{real_answer}" {answer_parent}by <@{user}>. '
                             '{points} point{plural}!'.format(
-                                guess=guess,
+                                real_answer=safe_embolden(real_answer),
                                 user=user,
                                 # TODO: Refactor with Question class:
                                 answer_parent=answer_parent,

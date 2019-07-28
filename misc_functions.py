@@ -61,3 +61,10 @@ def check_for_markdown(string):
     for char in SPECIAL_MARKDOWN_CHARS:
         if char in string:
             return True
+
+
+def safe_embolden(string):
+    if '*' in string:
+        return string
+    else:
+        return f'*{string}*'
