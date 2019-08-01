@@ -9,6 +9,7 @@ import logging
 from html import unescape
 from config import *
 from misc_functions import *
+from math import floor
 
 FORMAT = '%(asctime)s %(name)s %(levelname)5s - %(message)s'
 logging.basicConfig(level=logging.DEBUG, format=FORMAT)
@@ -264,6 +265,9 @@ class Question():
         self.autogen_clues = False
         self.points = POINT_DEFAULT_WEIGHT  # read from global for now
         self.original_points = POINT_DEFAULT_WEIGHT
+        self.incorrect_guesses = []
+        # build this up when looping through the choices
+        self.possible_incorrect_answers = []
 
         # Slack module currently doesn't support setting mrkdown:false in the message
         self.disable_markdown = False  # Set to true if markdown chars detected in text
@@ -301,6 +305,8 @@ class Question():
                     # Legacy hangup: answers is still a list of one.
                     self.answers = [choice_letter]
                     self.real_answer = choice.lstrip('\n')
+                else:
+                    self.possible_incorrect_answers.append(choice_letter)
 
         if quiz.mode == 'QA':
             for key, value in json_data['questions'][q_id].items():
@@ -348,6 +354,20 @@ class Question():
 
     def update_points(self, points):
         self.points = points
+
+    def check_multi_choice_guess(self, guess):
+        # TODO: move from global to Question property
+        if question_answered_correctly:
+            return
+        if guess in self.possible_incorrect_answers:
+            self.incorrect_guesses.append(guess)
+            self.possible_incorrect_answers.remove(guess)
+
+            penalty = floor(self.num_choices /
+                            (len(self.possible_incorrect_answers) + 1))
+            if self.points > 1.0:
+                self.update_points(self.original_points - penalty)
+            return penalty
 
 
 def check_if_points_escalated():
@@ -497,6 +517,12 @@ class Player:
             f'Answer correct by {self.user_id}. '
             f'Adding {points} points. Total: {self.score}. '
             f'Answered: {self.total_correct_answers}'
+        )
+
+    def dec_score(self, points):
+        self.score -= points
+        logger.info(
+            f'Score penalty for {self.user_id}. -{points} points'
         )
 
     @staticmethod
@@ -832,9 +858,27 @@ def game_loop():
                 except:
                     pass
                 # Answer was right, but already found
-                if guess in answers_found:
+                if guess in answers_found and quiz.mode != 'MultiChoice':
                     bot_reaction(msg_timestamp=time_at,
                                  emoji='snail')
+
+                # MultiChoice check
+                point_penalty = cur_question.check_multi_choice_guess(guess)
+                if point_penalty:
+                    bot_reaction(msg_timestamp=time_at,
+                                 emoji='negative_squared_cross_mark')
+                    bot_say('<@{user}> loses {point_penalty} point{plural_p}!'
+                            ' Question now worth {p} point{plural_q}! :man-golfing:'.format(
+                                user=user,
+                                point_penalty=point_penalty,
+                                p=cur_question.points,
+                                plural_p=check_plural(point_penalty),
+                                plural_q=check_plural(cur_question.points)
+                            )
+                            )
+
+                    player.dec_score(point_penalty)
+
                 # Right answer
                 if guess in answers:
                     last_correct_answer = float(time_at)

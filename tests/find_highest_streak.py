@@ -26,6 +26,13 @@ player3.inc_score(1)
 
 player4 = Player('POOP')
 player4.total_guesses += 10
+player4.inc_score(1)
+player4.dec_score(1)
+player4.dec_score(3)
+
+player5 = Player('TURD')
+player5.dec_score(5)
+
 
 logger.info(Player.dump_instances())
 
