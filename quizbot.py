@@ -354,7 +354,7 @@ def check_if_points_escalated():
         time.time() - last_correct_answer >= float(SECONDS_NO_GUESSES)
         and not POINT_ESCALATION_OFFERED
     ):
-        point_weight = 2
+        point_weight = point_weight * POINT_INCREASE_MULTIPLE_1
         logger.info(f'Point escalation to {point_weight}')
         bot_say(
             'There have not been any correct guesses in {} seconds. '

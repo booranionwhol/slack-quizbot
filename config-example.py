@@ -11,6 +11,8 @@ QUESTION_TIMEOUT = 200  # Give up and move to the next question
 SECONDS_BETWEEN_ANSWER_AND_QUESTION = 10
 
 POINT_DEFAULT_WEIGHT = 1
+# Multiply for the first escalation after SECONDS_NO_GUESSES
+POINT_INCREASE_MULTIPLE_1 = 2.0
 STREAK_BONUS_THRESHOLD = 3
 GOLDEN_ANSWER_POINTS = 3  # For list style quizes
 
