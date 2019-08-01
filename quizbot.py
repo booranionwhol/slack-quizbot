@@ -258,9 +258,12 @@ def bot_say(msg, channel=QUIZ_CHANNEL_ID):
 class Question():
     # json_data should be read in future from a Quiz class?
     def __init__(self, q_id):
-        logger.info(f'New question loaded. question_id: {q_id}')
+        logger.info(
+            f'New question loaded. question_id: {q_id}. Points: {POINT_DEFAULT_WEIGHT}')
         self.has_clues = False  # Flip if we find a clue, or autogen_clues is on
         self.autogen_clues = False
+        self.points = POINT_DEFAULT_WEIGHT  # read from global for now
+        self.original_points = POINT_DEFAULT_WEIGHT
 
         # Slack module currently doesn't support setting mrkdown:false in the message
         self.disable_markdown = False  # Set to true if markdown chars detected in text
@@ -343,6 +346,9 @@ class Question():
         else:
             return ''
 
+    def update_points(self, points):
+        self.points = points
+
 
 def check_if_points_escalated():
     # We need to set this to check in a later read loop. Make global
@@ -355,6 +361,8 @@ def check_if_points_escalated():
         and not POINT_ESCALATION_OFFERED
     ):
         point_weight = point_weight * POINT_INCREASE_MULTIPLE_1
+        cur_question.update_points(point_weight)
+
         logger.info(f'Point escalation to {point_weight}')
         bot_say(
             'There have not been any correct guesses in {} seconds. '
@@ -370,6 +378,8 @@ def check_if_points_escalated():
         and cur_question.has_clues
     ):
         point_weight = 0.5
+        cur_question.update_points(point_weight)
+
         logger.info(f'First Clue offered. {point_weight} points')
         bot_say(
             'There have not been any correct guesses in {} seconds. '
@@ -386,6 +396,8 @@ def check_if_points_escalated():
         and cur_question.has_clues
     ):
         point_weight = 0.1
+        cur_question.update_points(point_weight)
+
         logger.info(f'Second Clue offered. {point_weight} points')
         bot_say(
             'You are all terrible. No correct guesses in {} seconds. '
@@ -855,12 +867,12 @@ def game_loop():
                                 user=user,
                                 # TODO: Refactor with Question class:
                                 answer_parent=answer_parent,
-                                points=point_weight,
-                                plural=check_plural(point_weight)
+                                points=cur_question.points,
+                                plural=check_plural(cur_question.points)
                             )
                         )
 
-                    player.inc_score(point_weight)
+                    player.inc_score(cur_question.points)
                     player.answer_time(last_correct_answer-last_question_time)
 
                     bot_reaction(msg_timestamp=time_at,
