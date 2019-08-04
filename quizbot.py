@@ -284,9 +284,7 @@ class Question():
 
             q_object = json_data['questions'][q_id]
             key, value = [x for x in q_object.items()][0]
-            if '*' not in key:
-                # Make the question bold. Answer multi choices won't be.
-                self.question = f'*{key}*'
+            self.question = safe_embolden(key)
             multiple_choices = value
             correct_choice = multiple_choices[0]
             random.shuffle(multiple_choices)
@@ -311,11 +309,7 @@ class Question():
         if quiz.mode == 'QA':
             for key, value in json_data['questions'][q_id].items():
                 if key != "parent":
-                    if check_for_markdown(key):
-                        self.question = key
-                        self.disable_markdown = True
-                    else:
-                        self.question = f'*{key}*'
+                    self.question = safe_embolden(key)
                     self.answers = [x.lower() for x in value]
                     self.real_answer = value
 
@@ -756,7 +750,7 @@ def game_loop():
                 bot_say(
                     '<!here> Quiz starting. {title} - {description}.\n\n'
                     'There are *{total}* total questions.'.format(
-                        title=json_data['title'],
+                        title=safe_embolden(json_data['title']),
                         total=QUESTION_COUNT,
                         description=json_data['description']
                     )
@@ -771,11 +765,11 @@ def game_loop():
                 ask_question(CURRENT_QUESTION)
             else:
                 bot_say(
-                    '<!here> Quiz starting. *{title}* - {description}.\n\n'
+                    '<!here> Quiz starting. {title} - {description}.\n\n'
                     'There are *{total}* total answers. *{goldens} golden answers*'
                     ':tada: worth *{golden_points}* points :moneybag: each.'
                     'Chosen at random.'.format(
-                        title=json_data['title'],
+                        title=safe_embolden(json_data['title']),
                         total=STARTING_ANSWER_COUNT,
                         description=json_data['description'],
                         goldens=len(golden_answers),

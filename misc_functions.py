@@ -64,7 +64,8 @@ def check_for_markdown(string):
 
 
 def safe_embolden(string):
-    if '*' in string:
+    # URLs get parsed by slack
+    if '*' in string or 'http' in string:
         return string
     else:
         return f'*{string}*'
