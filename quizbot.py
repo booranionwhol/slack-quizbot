@@ -733,7 +733,8 @@ def game_loop():
     # Yuck!
     global CURRENT_QUESTION, REMAINING_QUESTIONS, point_weight, answers, \
         last_correct_answer, question_answered_correctly, question_asked, \
-        POINT_ESCALATION_OFFERED, CLUES_OFFERED, answers_found, cur_question
+        POINT_ESCALATION_OFFERED, CLUES_OFFERED, answers_found, cur_question, \
+        last_question_time
 
     if sc.rtm_connect(with_team_state=True):
 
@@ -843,6 +844,9 @@ def game_loop():
 
                 if 'results' in guess and user == QUIZ_MASTER:
                     quiz_results(sc, results_object, forced=True)
+
+                if 'skip' in guess and user == QUIZ_MASTER:
+                    last_question_time -= (QUESTION_TIMEOUT + 500.0)
 
                 player.total_guesses += 1
 
