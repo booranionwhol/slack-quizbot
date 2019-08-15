@@ -357,6 +357,22 @@ class Question():
     def update_points(self, points):
         self.points = points
 
+    def check_multi_choice_spam_guess(self, guess):
+        if quiz.mode != 'MultiChoice':
+            return
+        # TODO: move from global to Question property
+        if question_answered_correctly:
+            return
+        if guess in self.answers:
+            return
+        if (
+            MULTICHOICE_PENALISE_SPAM_GUESS
+            and len(guess) == 1
+            and guess not in self.possible_incorrect_answers
+            and guess not in self.incorrect_guesses
+        ):
+            return True
+
     def check_multi_choice_guess(self, guess):
         if quiz.mode != 'MultiChoice':
             return
@@ -512,6 +528,7 @@ class Player:
         self.highest_score_streak = 0
         self.score_streak = 0
         self.bonus_score = 0.0
+        self.multi_choice_spam_penalty = MULTICHOICE_SPAM_GUESS_POINT_RANGE[0]
         # TODO: async fetch the user fullname and populate for later use
         Player.instances[user_id] = self
 
@@ -530,6 +547,19 @@ class Player:
         logger.info(
             f'Score penalty for {self.user_id}. -{points} points'
         )
+
+    def apply_spam_penalty(self):
+        penalty = self.multi_choice_spam_penalty
+        self.dec_score(penalty)
+        bot_say(
+            f'<@{self.user_id}> loses {penalty} point{check_plural(penalty)} for guessing a terrible guess!')
+
+        # Increment for next time
+        penalty += MULTICHOICE_SPAM_GUESS_POINT_INCREMENT
+        limit = MULTICHOICE_SPAM_GUESS_POINT_RANGE[1]
+        if penalty >= limit:
+            penalty = limit
+        self.multi_choice_spam_penalty = penalty
 
     @staticmethod
     def save_streak_record(user_id, streak):
@@ -853,7 +883,9 @@ def game_loop():
                     message.user, message.time_at, message.guess)
 
                 player = Player.load_player(user)
-
+                if user == 'USLACKBOT':
+                    logger.info('Skipping slackbot message')
+                    continue
                 if 'results' in guess and user == QUIZ_MASTER:
                     quiz_results(sc, results_object, forced=True)
 
@@ -873,6 +905,8 @@ def game_loop():
                                  emoji='snail')
 
                 # MultiChoice check
+                if cur_question.check_multi_choice_spam_guess(guess):
+                    player.apply_spam_penalty()
                 point_penalty = cur_question.check_multi_choice_guess(guess)
                 if point_penalty:
                     bot_reaction(msg_timestamp=time_at,

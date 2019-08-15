@@ -26,3 +26,9 @@ QUESTION_FILE = 'questions/capital_cities3.json'
 CLEAN_ANSWERS = True  # Disable for typing challenge and maths style quizes
 
 SKIP_QUIZ_MASTER_IN_RESULTS = True  # Set to False for easier testing
+
+# Consider any single letter guess not in the list, as attempted spam
+MULTICHOICE_PENALISE_SPAM_GUESS = True
+# For each proper bad, probably spammy guess per user, increment the penalty
+MULTICHOICE_SPAM_GUESS_POINT_INCREMENT = 2.0
+MULTICHOICE_SPAM_GUESS_POINT_RANGE = [1.0, 10.0]
