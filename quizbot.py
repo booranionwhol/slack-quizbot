@@ -294,7 +294,15 @@ class Question():
             #choice_letters = ['j', 'k', 'l', ';', '\'']
             #choice_letters = ['a', 's', 'd', 'f', 'g']
             #choice_letters = ['1', '2', '3', '4', '5']
-            choice_letters = ['a', 'b', 'c', 'd', 'e']
+            #choice_letters = ['a', 'b', 'c', 'd', 'e']
+            #random_letter_selection = string.printable
+            # letter_blacklist = ['I','O','0','l','\','*', '_', '~', '`','#','@',':','/']
+            random_letter_selection = \
+                '123456789abcdefghijkmnopqrstuvwxyz' \
+                'ABCDEFGHJKLMNPQRSTUVWXYZ' \
+                '!"$%&()+,-.;<=>?[]^{|}'
+            choice_letters = random.sample(
+                random_letter_selection, self.num_choices)
             for i in range(self.num_choices):
                 choice_letter = choice_letters[i]
                 choice = f'\n{choice_letter}) {multiple_choices[i]}'
@@ -350,8 +358,12 @@ class Question():
         self.points = points
 
     def check_multi_choice_guess(self, guess):
+        if quiz.mode != 'MultiChoice':
+            return
         # TODO: move from global to Question property
         if question_answered_correctly:
+            return
+        if guess in self.answers:
             return
         if guess in self.possible_incorrect_answers:
             self.incorrect_guesses.append(guess)
