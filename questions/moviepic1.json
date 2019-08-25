@@ -1,6 +1,7 @@
 {
     "title": "Movie picture riddle",
     "description": "In the following image. Name 20 movies.",
+    "mode": "List",
     "answers": [
         "Pulp Fiction",
         "The Red Shoes",

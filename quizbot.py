@@ -87,13 +87,13 @@ with open(QUESTION_FILE, encoding='utf-8') as file:
         CURRENT_QUESTION = 0
         QUESTION_COUNT = len(json_data['questions'])
         REMAINING_QUESTIONS = QUESTION_COUNT
-    else:  # For now, just a list style quiz
+    elif json_data.get('mode') in ['List']:  # For now, just a list style quiz
         for answer in json_data['answers']:
             if answer != '':
                 answers.append(clean_answer(
                     answer.strip().replace('&', '&amp;')))
         STARTING_ANSWER_COUNT = len(answers)
-        select_golden_answers()
+        golden_answers = select_golden_answers(answers)
 
 
 class Quiz():
@@ -105,17 +105,21 @@ class Quiz():
             # Autogen all clues unless explicitly set to False
             # Ie, maths quizes
             self.autogen_clues = quiz_json.get('autogen_clues', True)
-
-        if self.mode == 'MultiChoice':
+        elif self.mode == 'MultiChoice':
             self.multichoice = True
             self.autogen_clues = False
             global CLEAN_ANSWERS
             CLEAN_ANSWERS = False
+        elif self.mode == 'List':
+            pass
+        else:
+            logger.error(f'Unknown quiz mode: {self.mode}')
+            raise Exception('Unknown quiz mode')
 
 
 quiz = Quiz(json_data)
 
-if quiz.mode not in ['QA', 'MultiChoice']:
+if quiz.mode in ['List']:
     logger.info(answers)
     logger.info('golden: {}'.format(golden_answers))
 
@@ -223,8 +227,12 @@ def quiz_results(client, results_object, forced=False):
                     player.total_guesses *
                     100))
             )
-            result_output += " Average time: {avg:.1f}s. Streak: {streak}{streak_emoji}".format(
-                avg=player.average_answer_time,
+            if quiz.mode != 'List':
+                result_output += " Average time: {avg:.1f}s.".format(
+                    avg=player.average_answer_time
+                )
+
+            result_output += " Streak: {streak}{streak_emoji}".format(
                 streak=player.highest_score_streak,
                 streak_emoji=highest_streakers_emoji(player)
             )
@@ -233,10 +241,11 @@ def quiz_results(client, results_object, forced=False):
 
     bot_say('{}'.format(result_output))
     logger.info('OUT: %s', result_output)
-    fastest_time, fastest_user = Player.order_player_results(
-        order_attribute='fastest_answer', reverse=False)[0]
-    bot_say('Fastest answer time by <@{fastest_user}>: {fastest_time:.4f}s'.format(
-        fastest_user=fastest_user, fastest_time=fastest_time))
+    if quiz.mode != 'List':
+        fastest_time, fastest_user = Player.order_player_results(
+            order_attribute='fastest_answer', reverse=False)[0]
+        bot_say('Fastest answer time by <@{fastest_user}>: {fastest_time:.4f}s'.format(
+            fastest_user=fastest_user, fastest_time=fastest_time))
     if Player.high_streakers:
         bot_say(RESULTS_STREAKERS_MSG)
     logger.info(f'Players ordered by points: {player_results_by_points}')
@@ -263,6 +272,7 @@ class Question():
             f'New question loaded. question_id: {q_id}. Points: {POINT_DEFAULT_WEIGHT}')
         self.has_clues = False  # Flip if we find a clue, or autogen_clues is on
         self.autogen_clues = False
+        self.has_parent = False
         self.points = POINT_DEFAULT_WEIGHT  # read from global for now
         self.original_points = POINT_DEFAULT_WEIGHT
         self.incorrect_guesses = []
@@ -271,6 +281,9 @@ class Question():
 
         # Slack module currently doesn't support setting mrkdown:false in the message
         self.disable_markdown = False  # Set to true if markdown chars detected in text
+
+        if quiz.mode == 'List':
+            pass
 
         if quiz.mode == 'QA':
             # TODO: Allow override in quiz json.
@@ -806,11 +819,11 @@ def game_loop():
                 last_correct_answer = time.time()
                 # Makes new question instance in global cur_question
                 ask_question(CURRENT_QUESTION)
-            else:
+            elif quiz.mode == 'List':
                 bot_say(
                     '<!here> Quiz starting. {title} - {description}.\n\n'
                     'There are *{total}* total answers. *{goldens} golden answers*'
-                    ':tada: worth *{golden_points}* points :moneybag: each.'
+                    ':tada: worth *{golden_points}* points :moneybag: each. '
                     'Chosen at random.'.format(
                         title=safe_embolden(json_data['title']),
                         total=STARTING_ANSWER_COUNT,
@@ -819,6 +832,7 @@ def game_loop():
                         golden_points=GOLDEN_ANSWER_POINTS
                     )
                 )
+                cur_question = Question(0)
 
         # Main game loop
 
@@ -827,7 +841,7 @@ def game_loop():
             if quiz.mode in ['QA', 'MultiChoice']:
                 if REMAINING_QUESTIONS == 0:
                     quiz_results(sc, results_object)
-            else:
+            elif quiz.mode in ['List']:
                 if len(answers) == 0:
                     quiz_results(sc, results_object)
 
@@ -905,9 +919,13 @@ def game_loop():
                                  emoji='snail')
 
                 # MultiChoice check
-                if cur_question.check_multi_choice_spam_guess(guess):
-                    player.apply_spam_penalty()
-                point_penalty = cur_question.check_multi_choice_guess(guess)
+                if quiz.mode in ['MultiChoice']:
+                    if cur_question.check_multi_choice_spam_guess(guess):
+                        player.apply_spam_penalty()
+                    point_penalty = cur_question.check_multi_choice_guess(
+                        guess)
+                else:
+                    point_penalty = False
                 if point_penalty:
                     bot_reaction(msg_timestamp=time_at,
                                  emoji='negative_squared_cross_mark')
@@ -969,7 +987,7 @@ def game_loop():
                     # Not the best way if the list is huge? Or if there's dupes?
                     answers.remove(guess)
                     answers_found.append(guess)
-                    if quiz.mode not in ['QA', 'MultiChoice']:
+                    if quiz.mode in ['List']:
                         bot_say("There are {} answers left".format(len(answers)))
 
                     # Reset point offer increase

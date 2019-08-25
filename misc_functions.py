@@ -1,13 +1,17 @@
+import random
+import os
 # These functions should really be in an appropriate Class
 # They are all generic and not related to the Bot, Results, or Questions for now
 
 
-def select_golden_answers():
+def select_golden_answers(answers):
     random.seed(os.urandom(1024))
+    golden_answers = []
     for _ in range(1, int(len(answers)/10)):
         golden_random = random.choice(answers)
         if golden_random not in golden_answers:
             golden_answers.append(golden_random)
+    return golden_answers
 
 
 def find_vowels(line):

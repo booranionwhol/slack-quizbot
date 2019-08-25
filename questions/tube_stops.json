@@ -1,6 +1,7 @@
 {
     "title": "London Tube stations",
     "description": "Names of London Underground stations",
+    "mode": "List",
     "answers": [
         "Abbey Road",
         "Acton Town",

@@ -1,6 +1,7 @@
 {
     "title": "American Capital Cities",
     "description": "Capital cities of each U.S. state. Don't include the state itself.",
+    "mode": "List",
     "answers": [
         "Montgomery",
         "Juneau",

@@ -1,6 +1,7 @@
 {
     "title": "Tom Hanks movies",
     "description": "English names for movies starring Tom Hanks.",
+    "mode": "List",
     "answers": [
         "He Knows You're Alone",
         "Splash",

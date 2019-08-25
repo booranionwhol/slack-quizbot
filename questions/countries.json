@@ -1,6 +1,7 @@
 {
     "title": "All countries",
     "description": "English names for all countries. Taken from Wikipedia",
+    "mode": "List",
     "answers": [
         "Afghanistan",
         "Albania",
