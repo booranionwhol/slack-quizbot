@@ -133,11 +133,11 @@ class OutputImage():
         else:
             mask_png = None
 
-        wordcloud = WordCloud(font_path=r'C:\Windows\Fonts\Verdana.ttf',
+        wordcloud = WordCloud(font_path=r'/mnt/c/Windows/Fonts/Verdana.ttf',
                               background_color='white',
                               repeat=True,
                               min_font_size=12,
-                              width=800,
+                              width=random.randint(800,1000),
                               height=600,
                               max_words=self.max_words,
                               max_font_size=150,
