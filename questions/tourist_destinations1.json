@@ -1,0 +1,327 @@
+{
+    "title": "Tourist Destinations - No Vowels #1",
+    "description": "Popular GLOBAL tourist destinations. Vowels removed",
+    "mode": "QA",
+    "questions": [
+        {
+            "SGR DFML": [
+                "Sagrada Familia"
+            ],
+            "parent": {
+                "Location": "Barcelona, Spain"
+            }
+        },
+        {
+            "THF RBDD NCTY": [
+                "The Forbidden City"
+            ],
+            "parent": {
+                "Location": "Beijing, China"
+            }
+        },
+        {
+            "LSC XCVS": [
+                "Lascaux Caves"
+            ],
+            "parent": {
+                "Location": "France"
+            }
+        },
+        {
+            "KLM NJR": [
+                "Kilimanjaro"
+            ],
+            "parent": {
+                "Location": "Tanzania"
+            }
+        },
+        {
+            "TRF LGR SQR": [
+                "Trafalgar Square"
+            ],
+            "parent": {
+                "Location": "London, England"
+            }
+        },
+        {
+            "HGS PH": [
+                "Hagia Sophia"
+            ],
+            "parent": {
+                "Location": "Istanbul, Turkey"
+            }
+        },
+        {
+            "SNT RN": [
+                "Santorini"
+            ],
+            "parent": {
+                "Location": "Greece"
+            }
+        },
+        {
+            "WSTM NST RBBY": [
+                "Westminster Abbey"
+            ],
+            "parent": {
+                "Location": "London, England"
+            }
+        },
+        {
+            "BLM SQ": [
+                "Blue Mosque"
+            ],
+            "parent": {
+                "Location": "Istanbul, Turkey"
+            }
+        },
+        {
+            "LCT RZ": [
+                "Alcatraz"
+            ],
+            "parent": {
+                "Location": "San Francisco"
+            }
+        },
+        {
+            "TVL GRD NS": [
+                "Tivoli Gardens"
+            ],
+            "parent": {
+                "Location": "Copenhagen, Denmark"
+            }
+        },
+        {
+            "MNT RSH MR": [
+                "Mount Rushmore"
+            ],
+            "parent": {
+                "Location": "South Dakota"
+            }
+        },
+        {
+            "MLL BRDG": [
+                "Millau Bridge"
+            ],
+            "parent": {
+                "Location": "France"
+            }
+        },
+        {
+            "LHM BR": [
+                "Alhambra"
+            ],
+            "parent": {
+                "Location": "Granada, Spain"
+            }
+        },
+        {
+            "PZZ DLC MP": [
+                "Piazza Del Campo"
+            ],
+            "parent": {
+                "Location": "Siena, Italy"
+            }
+        },
+        {
+            "MPRS TTBL DNG": [
+                "Empire State Building"
+            ],
+            "parent": {
+                "Location": "New York"
+            }
+        },
+        {
+            "PPL PLC": [
+                "Papel Palace"
+            ],
+            "parent": {
+                "Location": "Avignon, France"
+            }
+        },
+        {
+            "SST NCH PL": [
+                "Sistine Chapel"
+            ],
+            "parent": {
+                "Location": "Vatican City"
+            }
+        },
+        {
+            "VCT RFL LS": [
+                "Victoria Falls"
+            ],
+            "parent": {
+                "Location": "Zambia"
+            }
+        },
+        {
+            "PYR MDS FGZ": [
+                "Pyramids of Giza"
+            ],
+            "parent": {
+                "Location": "Egypt"
+            }
+        },
+        {
+            "LC HN SS": [
+                "Loch Ness"
+            ],
+            "parent": {
+                "Location": "Scotland"
+            }
+        },
+        {
+            "SYDN YHRB RBRDG": [
+                "Sydney Harbor Bridge"
+            ],
+            "parent": {
+                "Location": "Australia"
+            }
+        },
+        {
+            "LLS SLND": [
+                "Ellis Island"
+            ],
+            "parent": {
+                "Location": "New York / New Jersey"
+            }
+        },
+        {
+            "PTR": [
+                "Petra"
+            ],
+            "parent": {
+                "Location": "Jordan"
+            }
+        },
+        {
+            "CNT RLP RK": [
+                "Central Park"
+            ],
+            "parent": {
+                "Location": "New York"
+            }
+        },
+        {
+            "TWR BRDG": [
+                "Tower Bridge"
+            ],
+            "parent": {
+                "Location": "London"
+            }
+        },
+        {
+            "MN TFJ": [
+                "Mount Fuji"
+            ],
+            "parent": {
+                "Location": "Japan"
+            }
+        },
+        {
+            "BRN DNB RGGT": [
+                "Brandenburg Gate"
+            ],
+            "parent": {
+                "Location": "Berlin, Germany"
+            }
+        },
+        {
+            "CPT LHLL": [
+                "Capitol Hill"
+            ],
+            "parent": {
+                "Location": "Washington, D.C"
+            }
+        },
+        {
+            "MCH PCCH": [
+                "Machu Picchu"
+            ],
+            "parent": {
+                "Location": "Peru"
+            }
+        },
+        {
+            "CRP LS": [
+                "Acropolis"
+            ],
+            "parent": {
+                "Location": "Greece"
+            }
+        },
+        {
+            "WLN GWLL": [
+                "Wailing Wall"
+            ],
+            "parent": {
+                "Location": "Jerusalem"
+            }
+        },
+        {
+            "CHP LBR DG": [
+                "Chapel Bridge"
+            ],
+            "parent": {
+                "Location": "Switzerland"
+            }
+        },
+        {
+            "GLD NGT BRDG": [
+                "Golden Gate Bridge"
+            ],
+            "parent": {
+                "Location": "San Francisco"
+            }
+        },
+        {
+            "TMM": [
+                "Atomium"
+            ],
+            "parent": {
+                "Location": "Brussels, Belgium"
+            }
+        },
+        {
+            "TBLM NTN": [
+                "Table Mountain"
+            ],
+            "parent": {
+                "Location": "South Africa"
+            }
+        },
+        {
+            "GZN TNL PRK": [
+                "Iguazu National Park"
+            ],
+            "parent": {
+                "Location": "Argentina"
+            }
+        },
+        {
+            "TK YT WR": [
+                "Tokyo Tower"
+            ],
+            "parent": {
+                "Location": "Japan"
+            }
+        },
+        {
+            "GRTB DDH": [
+                "Great Buddha"
+            ],
+            "parent": {
+                "Location": "India"
+            }
+        },
+        {
+            "WNT RPLC": [
+                "Winter Palace"
+            ],
+            "parent": {
+                "Location": "Saint Petersburg, Russia"
+            }
+        }
+    ]
+}

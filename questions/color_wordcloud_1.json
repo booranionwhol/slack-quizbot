@@ -1,0 +1,158 @@
+{
+    "title": "Stroop test! - Find the correct colour! #1",
+    "description": "Of all the words in the posted images, find the word that descibes its colour. There is only one correct answer!",
+    "mode": "QA",
+    "autogen_clues": false,
+    "questions": [
+        {
+            "https://i.imgur.com/F0bm8PF.png": [
+                "purple"
+            ]
+        },
+        {
+            "https://i.imgur.com/fMFfcMd.png": [
+                "grey"
+            ]
+        },
+        {
+            "https://i.imgur.com/RndQ3V9.png": [
+                "red"
+            ]
+        },
+        {
+            "https://i.imgur.com/vNkzZyM.png": [
+                "pink"
+            ]
+        },
+        {
+            "https://i.imgur.com/UZ2Vxab.png": [
+                "purple"
+            ]
+        },
+        {
+            "https://i.imgur.com/PsiB1Lq.png": [
+                "blue"
+            ]
+        },
+        {
+            "https://i.imgur.com/AxgzS1I.png": [
+                "pink"
+            ]
+        },
+        {
+            "https://i.imgur.com/yMgF8l8.png": [
+                "grey"
+            ]
+        },
+        {
+            "https://i.imgur.com/TbUwnP1.png": [
+                "brown"
+            ]
+        },
+        {
+            "https://i.imgur.com/1nSdPVQ.png": [
+                "black"
+            ]
+        },
+        {
+            "https://i.imgur.com/QTqZAyP.png": [
+                "blue"
+            ]
+        },
+        {
+            "https://i.imgur.com/NUdctuk.png": [
+                "grey"
+            ]
+        },
+        {
+            "https://i.imgur.com/7k8yQOD.png": [
+                "brown"
+            ]
+        },
+        {
+            "https://i.imgur.com/0LofDe0.png": [
+                "red"
+            ]
+        },
+        {
+            "https://i.imgur.com/H4rFbyl.png": [
+                "grey"
+            ]
+        },
+        {
+            "https://i.imgur.com/XcQ6yJw.png": [
+                "pink"
+            ]
+        },
+        {
+            "https://i.imgur.com/93DLTSF.png": [
+                "orange"
+            ]
+        },
+        {
+            "https://i.imgur.com/2gNYyYA.png": [
+                "red"
+            ]
+        },
+        {
+            "https://i.imgur.com/FIJjXDQ.png": [
+                "green"
+            ]
+        },
+        {
+            "https://i.imgur.com/nsBFu1g.png": [
+                "blue"
+            ]
+        },
+        {
+            "https://i.imgur.com/uj1kp8w.png": [
+                "orange"
+            ]
+        },
+        {
+            "https://i.imgur.com/p2XFQuI.png": [
+                "red"
+            ]
+        },
+        {
+            "https://i.imgur.com/XNRSkbU.png": [
+                "black"
+            ]
+        },
+        {
+            "https://i.imgur.com/6LX66fq.png": [
+                "red"
+            ]
+        },
+        {
+            "https://i.imgur.com/hx12N8E.png": [
+                "green"
+            ]
+        },
+        {
+            "https://i.imgur.com/1EJdTSP.png": [
+                "black"
+            ]
+        },
+        {
+            "https://i.imgur.com/tRm2Urn.png": [
+                "orange"
+            ]
+        },
+        {
+            "https://i.imgur.com/tR4BRf9.png": [
+                "brown"
+            ]
+        },
+        {
+            "https://i.imgur.com/Uei4Dhd.png": [
+                "pink"
+            ]
+        },
+        {
+            "https://i.imgur.com/qvY9OyF.png": [
+                "brown"
+            ]
+        }
+    ]
+}

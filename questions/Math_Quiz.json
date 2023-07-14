@@ -1,0 +1,157 @@
+{
+  "mode": "QA", 
+  "description": "Work out the numbers from the text and solve the maths question. (Answer in number format)", 
+  "questions": [
+    {
+      "Divide the number of minutes in an hour by the number of months in a year.": [
+        "5"
+      ]
+    }, 
+    {
+      "Add the degrees Celsius at which water boils to the number of days in a leap year.": [
+        "466"
+      ]
+    }, 
+    {
+      "Subtract the number of reindeers that guide Santa's sleigh from the number of counties in Ireland.": [
+        "24"
+      ]
+    }, 
+    {
+      "Add the number of miles in a marathon and the number of colours in a rainbow.": [
+        "33"
+      ]
+    }, 
+    {
+      "Divide the number of the beast by the number of halves in a whole.": [
+        "333"
+      ]
+    }, 
+    {
+      "Subtract the number of digits in a debit card number from the number of weeks in a year.": [
+        "36"
+      ]
+    }, 
+    {
+      "Multiply what month September is by the floor number of the fire.com Dublin office.": [
+        "27"
+      ]
+    }, 
+    {
+      "Divide the number of ounces in a pound by the number of countries in the UK.": [
+        "4"
+      ]
+    }, 
+    {
+      "Add the number of inches in a foot to the number of pounds in a stone.": [
+        "26"
+      ]
+    }, 
+    {
+      "Subtract the smallest two digit prime number from the type of ice cream cone.": [
+        "88"
+      ]
+    }, 
+    {
+      "Add the number of grams in a kilogram to the number of metres in a kilometre.": [
+        "2000"
+      ]
+    }, 
+    {
+      "Subtract the age you can legally vote in Ireland from the number of years in a quarter of a century.": [
+        "7"
+      ]
+    }, 
+    {
+      "Subtract the number of US Presidents from the number of Heinz varieties.": [
+        "12"
+      ]
+    }, 
+    {
+      "Multiply the degrees in a right angle by the number of sides in a triangle.": [
+        "270"
+      ]
+    }, 
+    {
+      "Divide the number of cents in a Euro by the number of dimes  in a Dollar.": [
+        "10"
+      ]
+    }, 
+    {
+      "Multiply the number of blind mice by the number of sides in an octagon.": [
+        "24"
+      ]
+    }, 
+    {
+      "Add the number of dwarfs with Snow White and the number of provinces in Ireland.": [
+        "11"
+      ]
+    }, 
+    {
+      "Add the birthday considered sweet and the street a miracle took place on.": [
+        "50"
+      ]
+    }, 
+    {
+      "Subtract the number of legs a spider has from the number of years in a millennium.": [
+        "992"
+      ]
+    }, 
+    {
+      "Multiply the number of seasons in a year by the letters in the alphabet.": [
+        "104"
+      ]
+    }, 
+    {
+      "Divide the number of maids-a-milking by the number of horsemen of the apocalypse.": [
+        "2"
+      ]
+    }, 
+    {
+      "Subtract the number of problem Jay Z has from the number of miles the Proclaimers would walk.": [
+        "901"
+      ]
+    }, 
+    {
+      "Multiply the number of 0's in one million by the number of 0's in one billion.": [
+        "54"
+      ]
+    }, 
+    {
+      "Subtract a baker's dozen from the number of cards in a deck.": [
+        "39"
+      ]
+    }, 
+    {
+      "Add the number of Apostles and XVII.": [
+        "29"
+      ]
+    }, 
+    {
+      "Divide the number of hours in a day by the number of leaves in a shamrock.": [
+        "8"
+      ]
+    }, 
+    {
+      "Multiply the number of states on the USA by the number of vowels in the alphabet.": [
+        "250"
+      ]
+    }, 
+    {
+      "Add the sum of all the even digits and the sum of all the odd digits.": [
+        "45"
+      ]
+    }, 
+    {
+      "Subtract the number of squares on a chess board from the original number of dalmatians .": [
+        "37"
+      ]
+    }, 
+    {
+      "Multiply the answer to question 1 by the answer to question 13.": [
+        "60"
+      ]
+    }
+  ], 
+  "title": "Maths by Words"
+}

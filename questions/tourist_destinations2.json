@@ -1,0 +1,327 @@
+{
+    "title": "Tourist Destinations - No Vowels #2",
+    "description": "Popular GLOBAL tourist destinations. Vowels removed",
+    "mode": "QA",
+    "questions": [
+        {
+            "GNT SCS WY": [
+                "Giants Causeway"
+            ],
+            "parent": {
+                "Location": "Ireland"
+            }
+        },
+        {
+            "PNT VCCH": [
+                "Ponte Vecchio"
+            ],
+            "parent": {
+                "Location": "Florence, Italy"
+            }
+        },
+        {
+            "CNT WR": [
+                "CN Tower"
+            ],
+            "parent": {
+                "Location": "Toronto, Canada"
+            }
+        },
+        {
+            "RCKF GB RLTR": [
+                "Rock of Gibraltar"
+            ],
+            "parent": {
+                "Location": "EUROPE"
+            }
+        },
+        {
+            "CHC HNTZ": [
+                "Chichen Itza"
+            ],
+            "parent": {
+                "Location": "Mexico"
+            }
+        },
+        {
+            "BGBN": [
+                "Big Ben"
+            ],
+            "parent": {
+                "Location": "London"
+            }
+        },
+        {
+            "BRT SHM SM": [
+                "British Museum"
+            ],
+            "parent": {
+                "Location": "London"
+            }
+        },
+        {
+            "LR": [
+                "Uluru"
+            ],
+            "parent": {
+                "Location": "Australia"
+            }
+        },
+        {
+            "CL FFS FMHR": [
+                "Cliffs of Moher"
+            ],
+            "parent": {
+                "Location": "Ireland"
+            }
+        },
+        {
+            "RCD TRM PH": [
+                "Arc de Triomphe"
+            ],
+            "parent": {
+                "Location": "Paris, France"
+            }
+        },
+        {
+            "PTRN STWN TWRS": [
+                "Petronas Twin Towers"
+            ],
+            "parent": {
+                "Location": "Kuala Lumpur, Malaysia"
+            }
+        },
+        {
+            "NWG RNG": [
+                "Newgrange"
+            ],
+            "parent": {
+                "Location": "Co. Meath, Ireland"
+            }
+        },
+        {
+            "SPN SHS TPS": [
+                "Spanish Steps"
+            ],
+            "parent": {
+                "Location": "Rome, Italy"
+            }
+        },
+        {
+            "RND VRN": [
+                "Arena Di Verona"
+            ],
+            "parent": {
+                "Location": "Verona, Italy"
+            }
+        },
+        {
+            "THG RNDC NYN": [
+                "The Grand Canyon"
+            ],
+            "parent": {
+                "Location": "Arizona, USA"
+            }
+        },
+        {
+            "WHTC LFFS FDVR": [
+                "White Cliffs of Dover"
+            ],
+            "parent": {
+                "Location": "England"
+            }
+        },
+        {
+            "MNT VRST": [
+                "Mount Everest"
+            ],
+            "parent": {
+                "Location": "Nepal"
+            }
+        },
+        {
+            "RNT LPR LTWR": [
+                "Oriental Pearl Tower"
+            ],
+            "parent": {
+                "Location": "Shanghai, China"
+            }
+        },
+        {
+            "LVR MSM": [
+                "Louvre Museum"
+            ],
+            "parent": {
+                "Location": "Paris, France"
+            }
+        },
+        {
+            "BRD GFS GHS": [
+                "Bridge of Sighs"
+            ],
+            "parent": {
+                "Location": "Venice, Italy"
+            }
+        },
+        {
+            "NSCH WNST NCSTL": [
+                "Neuschwanstein Castle"
+            ],
+            "parent": {
+                "Location": "Schwangau, Germany"
+            }
+        },
+        {
+            "BRYC CNYN NTNL PRK": [
+                "Bryce Canyon National Park"
+            ],
+            "parent": {
+                "Location": "Utah"
+            }
+        },
+        {
+            "BRN CSTL": [
+                "Bran Castle"
+            ],
+            "parent": {
+                "Location": "Romania"
+            }
+        },
+        {
+            "KRM LN": [
+                "Kremlin"
+            ],
+            "parent": {
+                "Location": "Moscow\u00e2\u20ac\u017d, Russia"
+            }
+        },
+        {
+            "JLT SBL CNY": [
+                "Juliets Balcony"
+            ],
+            "parent": {
+                "Location": "Verona, Italy"
+            }
+        },
+        {
+            "LND NY": [
+                "London Eye"
+            ],
+            "parent": {
+                "Location": "London, England"
+            }
+        },
+        {
+            "FRTR SSHH NSLZ BRG": [
+                "Fortress Hohensalzburg"
+            ],
+            "parent": {
+                "Location": "Salzburg, Austria"
+            }
+        },
+        {
+            "KRN BRG CSTL": [
+                "Kronborg Castle"
+            ],
+            "parent": {
+                "Location": "Denmark"
+            }
+        },
+        {
+            "GTW YRCH": [
+                "Gateway Arch"
+            ],
+            "parent": {
+                "Location": "St. Louis"
+            }
+        },
+        {
+            "GRT WLL FCHN": [
+                "Great Wall of China"
+            ],
+            "parent": {
+                "Location": "China"
+            }
+        },
+        {
+            "BRJ KHLF": [
+                "Burj Khalifa"
+            ],
+            "parent": {
+                "Location": "Dubai, United Arab Emirates"
+            }
+        },
+        {
+            "PMP": [
+                "Pompeii"
+            ],
+            "parent": {
+                "Location": "Campania, Italy"
+            }
+        },
+        {
+            "SPC NDL": [
+                "Space Needle"
+            ],
+            "parent": {
+                "Location": "Seattle, Washington"
+            }
+        },
+        {
+            "MNT STM CHL": [
+                "Mont St Michel"
+            ],
+            "parent": {
+                "Location": "France"
+            }
+        },
+        {
+            "TWR FLN DN": [
+                "Tower of London"
+            ],
+            "parent": {
+                "Location": "London, England"
+            }
+        },
+        {
+            "NTR DM": [
+                "Notre Dame"
+            ],
+            "parent": {
+                "Location": "Paris, France"
+            }
+        },
+        {
+            "PRG CSTL": [
+                "Prague Castle"
+            ],
+            "parent": {
+                "Location": "Prague, Czech Republic"
+            }
+        },
+        {
+            "TJM HL": [
+                "Taj Mahal"
+            ],
+            "parent": {
+                "Location": "Agra, India"
+            }
+        },
+        {
+            "MDR DPLC": [
+                "Madrid Palace"
+            ],
+            "parent": {
+                "Location": "Madrid, Spain"
+            }
+        },
+        {
+            "TMS SQR": [
+                "Times Square"
+            ],
+            "parent": {
+                "Location": "New York"
+            }
+        }
+    ]
+}

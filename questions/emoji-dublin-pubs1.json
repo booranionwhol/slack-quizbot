@@ -1,0 +1,225 @@
+{
+    "title": "Dublin Pubs - Emojised #1",
+    "description": "Guess the Dublin Pub!",
+    "mode": "QA",
+    "questions": [
+        {
+            ":chestnut::seedling::herb::deciduous_tree::gun::gun:": [
+                "Grogans"
+            ]
+        },
+        {
+            ":cop::skin-tone-3::toilet::toilet:": [
+                "Copperface Jacks"
+            ]
+        },
+        {
+            ":fuelpump:": [
+                "Gasworks",
+                "The Gasworks"
+            ]
+        },
+        {
+            ":flag-au: :man: :crocodile: ": [
+                "Hogans"
+            ]
+        },
+        {
+            ":wind_blowing_face:  ( ! :fork_and_knife: )": [
+                "wetherspoons"
+            ]
+        },
+        {
+            ":deciduous_tree:": [
+                "The Oak",
+                "Oak"
+            ]
+        },
+        {
+            "( :toilet: :shower: )  (:green_apple: :computer::computer: )": [
+                "P Macs"
+            ]
+        },
+        {
+            ":flag-es::house:": [
+                "The Hacienda"
+            ]
+        },
+        {
+            ":wolf::first_quarter_moon_with_face:": [
+                "Howl at the moon"
+            ]
+        },
+        {
+            ":laughing: :couch_and_lamp: ": [
+                "The Laughter Lounge",
+                "Laughter Lounge"
+            ]
+        },
+        {
+            ":flag-ie: :tumbler_glass: :glass_of_milk: ": [
+                "The Bailey",
+                "The Bailey Bar"
+            ]
+        },
+        {
+            ":atm:": [
+                "Hole In The Wall",
+                "The Hole In The Wall"
+            ]
+        },
+        {
+            ":octagonal_sign: ": [
+                "Octagon Bar",
+                "The Octagon Bar"
+            ]
+        },
+        {
+            ":ram::derelict_house_building:": [
+                "Wool Shed",
+                "The Wool Shed"
+            ]
+        },
+        {
+            ":rabbit::lemon:": [
+                "Hairy Lemon",
+                "The Hairy Lemon"
+            ]
+        },
+        {
+            ":coffee: :croissant: ": [
+                "Cafe en Seine",
+                "Café en Seine"
+            ]
+        },
+        {
+            ":syringe::horse:": [
+                "Bleeding Horse",
+                "The Bleeding Horse"
+            ]
+        },
+        {
+            ":mount_fuji::clock4:pm": [
+                "Hill 16"
+            ]
+        },
+        {
+            ":two_men_holding_hands::rainbow:": [
+                "The George"
+            ]
+        },
+        {
+            ":car:  :hole: ": [
+                "Garage Bar",
+                "The Garage Bar"
+            ]
+        },
+        {
+            ":japan::airplane_departure::airplane::airplane_arriving::stadium:": [
+                "The International"
+            ]
+        },
+        {
+            ":ship::person_with_blond_hair::skin-tone-4:": [
+                "Ferryman",
+                "The Ferryman"
+            ]
+        },
+        {
+            ":corn: :curling_stone: ": [
+                "Cobblestone",
+                "The Cobblestone"
+            ]
+        },
+        {
+            ":bird::wc::candy::person_with_blond_hair::skin-tone-4::boy::skin-tone-2:": [
+                "Sweetmans",
+                "J. W. Sweetman",
+                "J. W. Sweetmans"
+            ]
+        },
+        {
+            ":statue_of_liberty::bell:": [
+                "Liberty Belle",
+                "The Liberty Belle"
+            ]
+        },
+        {
+            ":straight_ruler: :straight_ruler::straight_ruler::straight_ruler::straight_ruler::straight_ruler::straight_ruler::straight_ruler: :curling_stone: ": [
+                "The Longstone",
+                "The Long Stone"
+            ]
+        },
+        {
+            ":bellhop_bell::books::chocolate_bar:": [
+                "The Library Bar"
+            ]
+        },
+        {
+            ":construction_worker: :hamburger:": [
+                "Workmans Club",
+                "The Workmans Club"
+            ]
+        },
+        {
+            ":fire:": [
+                "Fire"
+            ]
+        },
+        {
+            ":pig::email::lion_face:": [
+                "Pygmalion"
+            ]
+        },
+        {
+            ":euro::tophat::man::skin-tone-2::euro::tophat::man::skin-tone-2::euro::tophat::man::skin-tone-2:": [
+                "Bankers"
+            ]
+        },
+        {
+            ":game_die::chocolate_bar:": [
+                "Dice Bar",
+                "The Dice Bar"
+            ]
+        },
+        {
+            ":boar:": [
+                "Boars Head",
+                "The Boars Head"
+            ]
+        },
+        {
+            ":bulldozer: :japanese_castle: ": [
+                "Bull and Castle",
+                "The Bull and Castle"
+            ]
+        },
+        {
+            ":guardsman::skin-tone-4::european_castle::guardsman::skin-tone-3:": [
+                "The Palace"
+            ]
+        },
+        {
+            "( :man: :boy: :ghost:  ) :chocolate_bar: ": [
+                "Trinity Bar",
+                "The Trinity Bar"
+            ]
+        },
+        {
+            ":bank::euro:": [
+                "The Bank"
+            ]
+        },
+        {
+            ":game_die::slightly_smiling_face::slightly_smiling_face:": [
+                "Diceys",
+                "Diceys Garden"
+            ]
+        },
+        {
+            ":older_woman::skin-tone-2::coffee:?:coffee:?:coffee:?:older_woman::skin-tone-2::coffee:?:coffee:?": [
+                "Doyles"
+            ]
+        }
+    ]
+}
