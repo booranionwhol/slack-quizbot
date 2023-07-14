@@ -1,0 +1,33 @@
+:crown: :monkey:,King Kong
+:shower: :knife:,Psycho
+Fe :man:,Iron Man
+:fast_forward::angry:,The Fast and the Furious
+:sleuth_or_spy: :boy: :girl:,Spy Kids
+:toilet: :candle:,John Wick
+:shaved_ice: :passenger_ship:,Titanic
+:ghost: :world_map:,Ghost World
+:ring:,The Ring
+:notebook:,The Notebook
+:man: :office: :electric_plug: :office:,Man on Wire
+:anchor: :man:,Anchorman
+:fast_forward: :angry: 6,The Fast and the Furious 6
+:scissors: :hand:,Edward Scissorhands
+:moneybag: :football:,Moneyball
+:capricorn: :leo: :libra: ....,Zodiac
+:girl: :sunny:,Little Miss Sunshine
+:older_adult: :boy:,Old Boy
+:shell: :shell: :shell:,Demolition Man
+:female_elf:,Elf
+:cup_with_straw: :oil_drum:,There Will be Blood
+:poop: :santa:,Bad Santa
+:ocean: :clock11:,Oceans 11
+:arrow_up:,Up
+:smiley::footprints:,Happy Feet
+:briefcase::blond-haired-woman:,Legally Blonde
+:flag-us: :world_map: :police_car:,Team America World Police
+:octopus: :cat:,Octopussy
+:mermaid:,Little Mermaid
+:school: :curling_stone:,School of Rock
+:100::100::100:,300
+:musical_keyboard:,The Pianist
+:rowboat: < :passenger_ship: ,Jaws
