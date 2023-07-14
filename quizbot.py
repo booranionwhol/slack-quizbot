@@ -100,6 +100,7 @@ class Quiz():
     def __init__(self, quiz_json):
         self.mode = quiz_json.get('mode')
         self.tiebreaker = quiz_json.get('tiebreaker')
+        self.shitlist = []
 
         if self.mode == 'QA':
             # Autogen all clues unless explicitly set to False
@@ -504,6 +505,13 @@ def parse_message(read_line_object):
             global ANTIPABLO_LETTERS
             ANTIPABLO_LETTERS = toggle(ANTIPABLO_LETTERS)
             logger.info(f'Setting ANTIPABLO_LETTERS to {ANTIPABLO_LETTERS}')
+        if 'block' in cleaned:
+            bad_user=cleaned.split(' ')[1].upper()
+            logger.info(f'Shitlisting user {bad_user}')
+            bot_say(f'<!here> Spammer detected! :angry: Shitlisting <@{bad_user}> for the rest of the quiz :poop:')
+            quiz.shitlist.append(bad_user)
+
+
         if cleaned.startswith('say'):
             bot_say('<!here> ' + orig_msg[4:])
 
@@ -883,6 +891,7 @@ def game_loop():
                 CURRENT_QUESTION = CURRENT_QUESTION+1
                 REMAINING_QUESTIONS = REMAINING_QUESTIONS-1
                 if REMAINING_QUESTIONS != 0:
+                    answers_found=[]
                     ask_question(CURRENT_QUESTION)
 
             msg_counter = 0
@@ -899,6 +908,9 @@ def game_loop():
                 player = Player.load_player(user)
                 if user == 'USLACKBOT':
                     logger.info('Skipping slackbot message')
+                    continue
+                if user in quiz.shitlist:
+                    logger.info(f'Skipping shitlist {user} message')
                     continue
                 if 'results' in guess and user == QUIZ_MASTER:
                     quiz_results(sc, results_object, forced=True)
