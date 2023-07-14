@@ -1,0 +1,24 @@
+:man::skin-tone-4::flag-mx::house:,Break for the Border
+:chestnut::seedling::herb::deciduous_tree::gun::gun:,Grogans
+:cop::skin-tone-3::toilet::toilet:,Copperface Jacks
+:fuelpump:,Gasworks
+:deciduous_tree:,Big Tree
+:wolf::first_quarter_moon_with_face:,Howl at the moon
+:atm:,Hole In The Wall
+:ram::derelict_house_building:,Wool shed
+:rabbit::lemon:,Hairy Lemon
+:syringe::horse:,Bleeding Horse
+:mount_fuji::clock4:pm,Hill 16
+:two_men_holding_hands::rainbow:,The George
+:japan::airplane_departure::airplane::airplane_arriving::stadium:,The International
+:ship::person_with_blond_hair::skin-tone-4:,Ferryman
+:bird::wc::candy::person_with_blond_hair::skin-tone-4::boy::skin-tone-2:,Sweetmans
+:statue_of_liberty::bell:,Liberty Belle
+:wc::hamburger::hamburger:,Workmans club
+:fire:,Fire
+:pig::email::lion_face:,Pygmalion
+:game_die::chocolate_bar:,Dice Bar
+:boar:,Boars Head
+:bank::euro:,The Bank
+:game_die::slightly_smiling_face::slightly_smiling_face:,Diceys
+:older_woman::skin-tone-2::coffee:?:coffee:?:coffee:?:older_woman::skin-tone-2::coffee:?:coffee:?,Doyles
